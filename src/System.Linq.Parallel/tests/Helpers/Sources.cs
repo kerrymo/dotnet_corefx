@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     internal static class Sources
     {
@@ -18,7 +16,7 @@ namespace Test
         }
 
         // Wrapper for attribute calls
-        public static IEnumerable<object[]> Ranges(object[] counts)
+        public static IEnumerable<object[]> Ranges(int[] counts)
         {
             foreach (object[] parms in Ranges(counts.Cast<int>())) yield return parms;
         }

@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using AstUtils = System.Linq.Expressions.Interpreter.Utils;
+using AstUtils = System.Linq.Expressions.Utils;
 
 namespace System.Linq.Expressions.Interpreter
 {
@@ -1026,7 +1026,7 @@ namespace System.Linq.Expressions.Interpreter
                 if(TypeUtils.IsNullableType(node.Operand.Type) &&
                     node.Method.GetParametersCached()[0].ParameterType.Equals(TypeUtils.GetNonNullableType(node.Operand.Type)))
                 {
-                    _instructions.Emit(NullableMethodCallInstruction.Create("get_Value", 1));
+                    _instructions.Emit(NullableMethodCallInstruction.CreateGetValue());
                 }
 
                 _instructions.EmitCall(node.Method);
@@ -1073,7 +1073,7 @@ namespace System.Linq.Expressions.Interpreter
                 TypeUtils.GetNonNullableType(typeFrom).Equals(typeTo))
             {
                 // VT? -> vt, call get_Value
-                _instructions.Emit(NullableMethodCallInstruction.Create("get_Value", 1));
+                _instructions.Emit(NullableMethodCallInstruction.CreateGetValue());
                 return;
             }
 
@@ -1187,6 +1187,13 @@ namespace System.Linq.Expressions.Interpreter
                         Compile(node.Operand);
                         _instructions.EmitDecrement(node.Type);
                         break;
+                    case ExpressionType.UnaryPlus:
+                        Compile(node.Operand);
+                        break;
+                    case ExpressionType.IsTrue:
+                    case ExpressionType.IsFalse:
+                        EmitUnaryBoolCheck(node);
+                        break;
                     default:
                         throw new PlatformNotSupportedException(SR.Format(SR.UnsupportedExpressionType, node.NodeType));
                 }
@@ -1198,31 +1205,44 @@ namespace System.Linq.Expressions.Interpreter
             Compile(node.Operand);
             if (node.IsLifted)
             {
-                LocalDefinition temp = _locals.DefineLocal(
-                    Expression.Parameter(node.Operand.Type),
-                    _instructions.Count
-                );
                 var notNull = _instructions.MakeLabel();
                 var computed = _instructions.MakeLabel();
 
-                _instructions.EmitStoreLocal(temp.Index);
-                _instructions.EmitLoadLocal(temp.Index);
-                _instructions.EmitLoad(null, typeof(object));
-                _instructions.EmitEqual(typeof(object));
-                _instructions.EmitBranchFalse(notNull);
-
-                _instructions.EmitLoad(null, typeof(object));
+                _instructions.EmitCoalescingBranch(notNull);
                 _instructions.EmitBranch(computed);
 
                 _instructions.MarkLabel(notNull);
                 _instructions.EmitCall(node.Method);
 
                 _instructions.MarkLabel(computed);
-                _locals.UndefineLocal(temp, _instructions.Count);
             }
             else
             {
                 _instructions.EmitCall(node.Method);
+            }
+        }
+
+        private void EmitUnaryBoolCheck(UnaryExpression node)
+        {
+            Compile(node.Operand);
+            if (node.IsLifted)
+            {
+                var notNull = _instructions.MakeLabel();
+                var computed = _instructions.MakeLabel();
+
+                _instructions.EmitCoalescingBranch(notNull);
+                _instructions.EmitBranch(computed);
+
+                _instructions.MarkLabel(notNull);
+                _instructions.EmitLoad(node.NodeType == ExpressionType.IsTrue);
+                _instructions.EmitEqual(typeof(bool));
+
+                _instructions.MarkLabel(computed);
+            }
+            else
+            {
+                _instructions.EmitLoad(node.NodeType == ExpressionType.IsTrue);
+                _instructions.EmitEqual(typeof(bool));
             }
         }
 
@@ -2110,8 +2130,7 @@ namespace System.Linq.Expressions.Interpreter
             }
 
             if (!node.Method.IsStatic &&
-                node.Object.Type.GetTypeInfo().IsGenericType &&
-                node.Object.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                node.Object.Type.IsNullableType())
             {
                 // reflection doesn't let us call methods on Nullable<T> when the value
                 // is null...  so we get to special case those methods!
@@ -2119,13 +2138,6 @@ namespace System.Linq.Expressions.Interpreter
             }
             else
             {
-                if (!node.Method.IsStatic)
-                {
-                    // emit null check, our instructions don't always do this when they're
-                    // calling via a delegate.  
-                    _instructions.EmitNullCheck(node.Arguments.Count);
-                }
-
                 if (updaters == null)
                 {
                     _instructions.EmitCall(node.Method, parameters);
@@ -2230,17 +2242,19 @@ namespace System.Linq.Expressions.Interpreter
                         _instructions.EmitStoreLocal(memberTemp.Value.Index);
                     }
 
-                    if (member.Member is FieldInfo)
+                    FieldInfo field = member.Member as FieldInfo;
+                    if (field != null)
                     {
-                        _instructions.EmitLoadField((FieldInfo)member.Member);
-                        return new FieldByRefUpdater(memberTemp, (FieldInfo)member.Member, index);
+                        _instructions.EmitLoadField(field);
+                        return new FieldByRefUpdater(memberTemp, field, index);
                     }
-                    else if (member.Member is PropertyInfo)
+                    PropertyInfo property = member.Member as PropertyInfo;
+                    if (property != null)
                     {
-                        _instructions.EmitCall(((PropertyInfo)member.Member).GetGetMethod(true));
-                        if (((PropertyInfo)member.Member).CanWrite)
+                        _instructions.EmitCall(property.GetGetMethod(true));
+                        if (property.CanWrite)
                         {
-                            return new PropertyByRefUpdater(memberTemp, (PropertyInfo)member.Member, index);
+                            return new PropertyByRefUpdater(memberTemp, property, index);
                         }
                         return null;
                     }
@@ -2393,7 +2407,19 @@ namespace System.Linq.Expressions.Interpreter
                     {
                         EmitThisForMethodCall(from);
                     }
-                    _instructions.EmitCall(method);
+
+                    if (!method.IsStatic &&
+                        from.Type.IsNullableType())
+                    {
+                        // reflection doesn't let us call methods on Nullable<T> when the value
+                        // is null...  so we get to special case those methods!
+                        _instructions.EmitNullableCall(method, Array.Empty<ParameterInfo>());
+                    }
+                    else
+                    {
+                        _instructions.EmitCall(method);
+                    }
+
                     return;
                 }
             }
@@ -2694,7 +2720,7 @@ namespace System.Linq.Expressions.Interpreter
                 return node;
             }
 
-            protected internal override Expression VisitLambda(LambdaExpression node)
+            protected internal override Expression VisitLambda<T>(Expression<T> node)
             {
                 PushParameters(node.Parameters);
 

@@ -1,18 +1,16 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     public class DistinctTests
     {
         private const int DuplicateFactor = 4;
 
-        public static IEnumerable<object[]> DistinctUnorderedData(object[] counts)
+        public static IEnumerable<object[]> DistinctUnorderedData(int[] counts)
         {
             foreach (object[] results in UnorderedSources.Ranges(counts.Cast<int>().Select(x => x * DuplicateFactor)))
             {
@@ -20,7 +18,7 @@ namespace Test
             }
         }
 
-        public static IEnumerable<object[]> DistinctData(object[] counts)
+        public static IEnumerable<object[]> DistinctData(int[] counts)
         {
             foreach (object[] results in Sources.Ranges(counts.Cast<int>().Select(x => x * DuplicateFactor)))
             {
@@ -28,7 +26,7 @@ namespace Test
             }
         }
 
-        public static IEnumerable<object[]> DistinctSourceMultipleData(object[] counts)
+        public static IEnumerable<object[]> DistinctSourceMultipleData(int[] counts)
         {
             foreach (int count in counts.Cast<int>())
             {

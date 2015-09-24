@@ -8,6 +8,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using Microsoft.Win32.SafeHandles;
 
 namespace Internal.Cryptography.Pal
 {
@@ -18,30 +19,119 @@ namespace Internal.Cryptography.Pal
 
         public static IStorePal FromBlob(byte[] rawData, string password, X509KeyStorageFlags keyStorageFlags)
         {
-            throw new NotImplementedException();
+            ICertificatePal singleCert;
+
+            if (CertificatePal.TryReadX509Der(rawData, out singleCert) ||
+                CertificatePal.TryReadX509Pem(rawData, out singleCert))
+            {
+                // The single X509 structure methods shouldn't return true and out null, only empty
+                // collections have that behavior.
+                Debug.Assert(singleCert != null);
+
+                return SingleCertToStorePal(singleCert);
+            }
+
+            List<ICertificatePal> certPals;
+
+            if (PkcsFormatReader.TryReadPkcs7Der(rawData, out certPals) ||
+                PkcsFormatReader.TryReadPkcs7Pem(rawData, out certPals) ||
+                PkcsFormatReader.TryReadPkcs12(rawData, password, out certPals))
+            {
+                Debug.Assert(certPals != null);
+
+                return ListToStorePal(certPals);
+            }
+            
+            return null;
         }
 
         public static IStorePal FromFile(string fileName, string password, X509KeyStorageFlags keyStorageFlags)
         {
-            throw new NotImplementedException();
+            using (SafeBioHandle bio = Interop.libcrypto.BIO_new_file(fileName, "rb"))
+            {
+                Interop.libcrypto.CheckValidOpenSslHandle(bio);
+
+                return FromBio(bio, password);
+            }
+        }
+
+        private static IStorePal FromBio(SafeBioHandle bio, string password)
+        {
+            int bioPosition = Interop.Crypto.BioTell(bio);
+            Debug.Assert(bioPosition >= 0);
+
+            ICertificatePal singleCert;
+
+            if (CertificatePal.TryReadX509Pem(bio, out singleCert))
+            {
+                return SingleCertToStorePal(singleCert);
+            }
+
+            // Rewind, try again.
+            CertificatePal.RewindBio(bio, bioPosition);
+
+            if (CertificatePal.TryReadX509Der(bio, out singleCert))
+            {
+                return SingleCertToStorePal(singleCert);
+            }
+
+            // Rewind, try again.
+            CertificatePal.RewindBio(bio, bioPosition);
+
+            List<ICertificatePal> certPals;
+
+            if (PkcsFormatReader.TryReadPkcs7Pem(bio, out certPals))
+            {
+                return ListToStorePal(certPals);
+            }
+
+            // Rewind, try again.
+            CertificatePal.RewindBio(bio, bioPosition);
+
+            if (PkcsFormatReader.TryReadPkcs7Der(bio, out certPals))
+            {
+                return ListToStorePal(certPals);
+            }
+
+            // Rewind, try again.
+            CertificatePal.RewindBio(bio, bioPosition);
+
+            if (PkcsFormatReader.TryReadPkcs12(bio, password, out certPals))
+            {
+                return ListToStorePal(certPals);
+            }
+
+            // Since we aren't going to finish reading, leaving the buffer where it was when we got
+            // it seems better than leaving it in some arbitrary other position.
+            // 
+            // But, before seeking back to start, save the Exception representing the last reported
+            // OpenSSL error in case the last BioSeek would change it.
+            Exception openSslException = Interop.libcrypto.CreateOpenSslCryptographicException();
+
+            // Use BioSeek directly for the last seek attempt, because any failure here should instead
+            // report the already created (but not yet thrown) exception.
+            Interop.Crypto.BioSeek(bio, bioPosition);
+
+            throw openSslException;
         }
 
         public static IStorePal FromCertificate(ICertificatePal cert)
         {
-            throw new NotImplementedException();
+            ICertificatePal duplicatedHandles = ((OpenSslX509CertificateReader)cert).DuplicateHandles();
+
+            return new CollectionBackedStoreProvider(new X509Certificate2(duplicatedHandles));
         }
 
         public static IStorePal LinkFromCertificateCollection(X509Certificate2Collection certificates)
         {
-            return new OpenSslX509StoreProvider(certificates);
+            return new CollectionBackedStoreProvider(certificates);
         }
 
         public static IStorePal FromSystemStore(string storeName, StoreLocation storeLocation, OpenFlags openFlags)
         {
             if (storeLocation != StoreLocation.LocalMachine)
             {
-                // TODO (#2206): Support CurrentUser persisted stores.
-                throw new NotImplementedException();
+                return new DirectoryBasedStoreProvider(storeName, openFlags);
             }
 
             if (openFlags.HasFlag(OpenFlags.ReadWrite))
@@ -79,6 +169,39 @@ namespace Internal.Cryptography.Pal
             throw new NotImplementedException();
         }
 
+        private static IStorePal SingleCertToStorePal(ICertificatePal singleCert)
+        {
+            return new OpenSslX509StoreProvider(
+                new X509Certificate2Collection(
+                    new X509Certificate2(singleCert)));
+        }
+
+        private static IStorePal ListToStorePal(List<ICertificatePal> certPals)
+        {
+            X509Certificate2Collection coll = new X509Certificate2Collection();
+
+            for (int i = 0; i < certPals.Count; i++)
+            {
+                coll.Add(new X509Certificate2(certPals[i]));
+            }
+
+            return new OpenSslX509StoreProvider(coll);
+        }
+
+        private static IStorePal PfxToCollection(OpenSslPkcs12Reader pfx, string password)
+        {
+            pfx.Decrypt(password);
+
+            X509Certificate2Collection coll = new X509Certificate2Collection();
+
+            foreach (OpenSslX509CertificateReader certPal in pfx.ReadCertificates())
+            {
+                coll.Add(new X509Certificate2(certPal));
+            }
+
+            return new OpenSslX509StoreProvider(coll);
+        }
+
         private static IStorePal CloneStore(X509Certificate2Collection seed)
         {
             X509Certificate2Collection coll = new X509Certificate2Collection();
@@ -104,7 +227,7 @@ namespace Internal.Cryptography.Pal
 
             try
             {
-                directoryInfo = new DirectoryInfo(Interop.NativeCrypto.GetX509RootStorePath());
+                directoryInfo = new DirectoryInfo(Interop.Crypto.GetX509RootStorePath());
             }
             catch (ArgumentException)
             {

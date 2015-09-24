@@ -1,17 +1,15 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Xunit;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     public class CountLongCountTests
     {
-        public static IEnumerable<object[]> OnlyOneData(object[] counts)
+        public static IEnumerable<object[]> OnlyOneData(int[] counts)
         {
             Func<int, IEnumerable<int>> positions = x => new[] { 0, x / 2, Math.Max(0, x - 1) }.Distinct();
             foreach (object[] results in UnorderedSources.Ranges(counts.Cast<int>(), positions)) yield return results;

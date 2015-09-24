@@ -66,6 +66,8 @@ namespace System.IO
 
         private void StopRaisingEvents()
         {
+            _enabled = false;
+
             // Make sure the Start and Stop can be called from different threads and don't 
             // stomp on the other's operation. We use the _syncLock instead of the
             // RunLoop or StreamRef because IntPtrs are value types and can't be locked
@@ -145,7 +147,7 @@ namespace System.IO
                 SafeCreateHandle path = Interop.CoreFoundation.CFStringCreateWithCString(_fullDirectory);
                 if (path.IsInvalid)
                 {
-                    throw Interop.GetExceptionForIoErrno(Marshal.GetLastWin32Error(), _fullDirectory, true);
+                    throw Interop.GetExceptionForIoErrno(Interop.Sys.GetLastErrorInfo(), _fullDirectory, true);
                 }
 
                 // Take the CFStringRef and put it into an array to pass to the EventStream
@@ -153,14 +155,17 @@ namespace System.IO
                 if (arrPaths.IsInvalid)
                 {
                     path.Dispose();
-                    throw Interop.GetExceptionForIoErrno(Marshal.GetLastWin32Error(), _fullDirectory, true);
+                    throw Interop.GetExceptionForIoErrno(Interop.Sys.GetLastErrorInfo(), _fullDirectory, true);
                 }
 
-                // Create the callback for the EventStream
-                _callback = new Interop.EventStream.FSEventStreamCallback(FileSystemEventCallback);
+                // Create the callback for the EventStream if it wasn't previously created for this instance.
+                if (_callback == null)
+                {
+                    _callback = new Interop.EventStream.FSEventStreamCallback(FileSystemEventCallback);
+                }
 
                 // Make sure the OS file buffer(s) are fully flushed so we don't get events from cached I/O
-                Interop.libc.sync();
+                Interop.Sys.Sync();
 
                 // Create the event stream for the path and tell the stream to watch for file system events.
                 _eventStream = Interop.EventStream.FSEventStreamCreate(
@@ -173,8 +178,10 @@ namespace System.IO
                 {
                     arrPaths.Dispose();
                     path.Dispose();
-                    throw Interop.GetExceptionForIoErrno(Marshal.GetLastWin32Error(), _fullDirectory, true);
+                    throw Interop.GetExceptionForIoErrno(Interop.Sys.GetLastErrorInfo(), _fullDirectory, true);
                 }
+
+                _enabled = true;
 
                 // Create and start our watcher thread then wait for the thread to initialize and start 
                 // the RunLoop. We wait for that to prevent this function from returning before the RunLoop
@@ -229,7 +236,7 @@ namespace System.IO
             FSEventStreamEventId[] eventIds)
         {
             Debug.Assert((numEvents.ToInt32() == eventPaths.Length) && (numEvents.ToInt32() == eventFlags.Length) && (numEvents.ToInt32() == eventIds.Length));
-            
+
             // Since renames come in pairs, when we find the first we need to search for the next one. Once we find it, we'll add it to this
             // list so when the for-loop comes across it, we'll skip it since it's already been processed as part of the original of the pair.
             List<FSEventStreamEventId> handledRenameEvents = null;
@@ -310,19 +317,21 @@ namespace System.IO
                     }
                     else
                     {
-                        // Note: we keep the same order (Create, delete, modify) as *nix but since OS X does some coalescing on it's own, we need to
-                        //       fire multiple events for the same item (potentially).
-                        if (IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemCreated))
+                        // OS X is wonky where it can give back kFSEventStreamEventFlagItemCreated and kFSEventStreamEventFlagItemRemoved
+                        // for the same item. The only option we have is to stat and see if the item exists; if so send created, otherwise send deleted.
+                        if ((IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemCreated)) ||
+                            (IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemRemoved)))
                         {
-                            // Next look for creates since a create + modification coalesced could confuse apps since a file they haven't heard of yet would get a mod event
-                            NotifyFileSystemEventArgs(WatcherChangeTypes.Created, relativePath);
+                            if (DoesItemExist(eventPaths[i], IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemIsFile)))
+                            {
+                                NotifyFileSystemEventArgs(WatcherChangeTypes.Created, relativePath);
+                            }
+                            else
+                            {
+                                NotifyFileSystemEventArgs(WatcherChangeTypes.Deleted, relativePath);
+                            }
                         }
-                        
-                        if (IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemRemoved))
-                        {
-                            NotifyFileSystemEventArgs(WatcherChangeTypes.Deleted, relativePath);
-                        }
-                        
+
                         if (IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemInodeMetaMod) ||
                             IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemModified) ||
                             IsFlagSet(eventFlags[i], Interop.EventStream.FSEventStreamEventFlags.kFSEventStreamEventFlagItemFinderInfoMod) ||

@@ -10,6 +10,8 @@
     <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CLSCompliant>false</CLSCompliant>
+    <PackageTargetFramework>dotnet</PackageTargetFramework>
+    <UsePackageTargetRuntimeDefaults>true</UsePackageTargetRuntimeDefaults>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Linux_Debug|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Linux_Release|AnyCPU' " />
@@ -17,6 +19,12 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'OSX_Release|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Windows_Debug|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Windows_Release|AnyCPU' " />
+  <ItemGroup>
+    <ProjectReference Include="..\..\System.Security.Cryptography.Primitives\src\System.Security.Cryptography.Primitives.csproj">
+      <Project>{D04A73AE-E418-4ACD-A132-7688435BE8B5}</Project>
+      <Name>System.Security.Cryptography.Primitives</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Internal\Cryptography\AsnFormatter.cs" />
     <Compile Include="Internal\Cryptography\Helpers.cs" />
@@ -42,6 +50,15 @@
     <Compile Include="$(CommonPath)\Interop\Windows\Crypt32\OidInfo.cs">
       <Link>Common\Interop\Windows\Crypt32\OidInfo.cs</Link>
     </Compile>
+    <Compile Include="$(CommonPath)\Internal\Cryptography\Windows\CryptoThrowHelper.cs">
+      <Link>Internal\Cryptography\Windows\CryptoThrowHelper.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonPath)\Interop\Windows\mincore\Interop.FormatMessage.cs">
+      <Link>Internal\Windows\mincore\Interop.FormatMessage.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonPath)\Interop\Windows\Interop.Libraries.cs">
+      <Link>Common\Interop\Windows\Interop.Libraries.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetsUnix)' == 'true' ">
     <Compile Include="Internal\Cryptography\AsnFormatter.Unix.cs" />
@@ -49,9 +66,6 @@
     <Compile Include="Internal\Cryptography\OpenSslAsnFormatter.cs" />
     <Compile Include="$(CommonPath)\Interop\Unix\Interop.Libraries.cs">
       <Link>Common\Interop\Unix\Interop.Libraries.cs</Link>
-    </Compile>
-    <Compile Include="$(CommonPath)\Interop\Unix\libcoreclr\Interop.EnsureOpenSslInitialized.cs">
-      <Link>Common\Interop\Unix\libcoreclr\Interop.EnsureOpenSslInitialized.cs</Link>
     </Compile>
     <Compile Include="$(CommonPath)\Interop\Unix\libcrypto\Interop.ASN1.cs">
       <Link>Common\Interop\Unix\libcrypto\Interop.ASN1.cs</Link>
@@ -62,8 +76,8 @@
     <Compile Include="$(CommonPath)\Interop\Unix\libcrypto\Interop.ERR.cs">
       <Link>Common\Interop\Unix\libcrypto\Interop.ERR.cs</Link>
     </Compile>
-    <Compile Include="$(CommonPath)\Interop\Unix\libcrypto\Interop.Initialization.cs">
-      <Link>Common\Interop\Unix\libcrypto\Interop.Initialization.cs</Link>
+    <Compile Include="$(CommonPath)\Interop\Unix\System.Security.Cryptography.Native\Interop.Initialization.cs">
+      <Link>Common\Interop\Unix\System.Security.Cryptography.Native\Interop.Initialization.cs</Link>
     </Compile>
     <Compile Include="$(CommonPath)\Interop\Unix\libcrypto\Interop.X509Ext.cs">
       <Link>Common\Interop\Unix\libcrypto\Interop.X509Ext.cs</Link>

@@ -21,26 +21,22 @@ namespace Internal.Cryptography.Pal
 {
     internal sealed partial class StorePal : IDisposable, IStorePal
     {
-        public IEnumerable<X509Certificate2> Certificates
+        public void CopyTo(X509Certificate2Collection collection)
         {
-            get
-            {
-                LowLevelListWithIList<X509Certificate2> certificates = new LowLevelListWithIList<X509Certificate2>();
+            Debug.Assert(collection != null);
 
-                SafeCertContextHandle pCertContext = null;
-                while (Interop.crypt32.CertEnumCertificatesInStore(_certStore, ref pCertContext))
-                {
-                    X509Certificate2 cert = new X509Certificate2(pCertContext.DangerousGetHandle());
-                    certificates.Add(cert);
-                }
-                return certificates;
+            SafeCertContextHandle pCertContext = null;
+            while (Interop.crypt32.CertEnumCertificatesInStore(_certStore, ref pCertContext))
+            {
+                X509Certificate2 cert = new X509Certificate2(pCertContext.DangerousGetHandle());
+                collection.Add(cert);
             }
         }
 
         public void Add(ICertificatePal certificate)
         {
             if (!Interop.crypt32.CertAddCertificateContextToStore(_certStore, ((CertificatePal)certificate).CertContext, CertStoreAddDisposition.CERT_STORE_ADD_REPLACE_EXISTING_INHERIT_PROPERTIES, IntPtr.Zero))
-                throw new CryptographicException(Marshal.GetLastWin32Error());
+                throw Marshal.GetLastWin32Error().ToCryptographicException();
             return;
         }
 
@@ -56,7 +52,7 @@ namespace Internal.Cryptography.Pal
 
                 CERT_CONTEXT* pCertContextToDelete = enumCertContext.Disconnect();  // CertDeleteCertificateFromContext always frees the context (even on error)
                 if (!Interop.crypt32.CertDeleteCertificateFromStore(pCertContextToDelete))
-                    throw new CryptographicException(Marshal.GetLastWin32Error());
+                    throw Marshal.GetLastWin32Error().ToCryptographicException();
 
                 GC.KeepAlive(existingCertContext);
                 return;

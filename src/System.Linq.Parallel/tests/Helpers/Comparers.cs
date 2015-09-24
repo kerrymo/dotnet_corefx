@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     internal class FailingEqualityComparer<T> : IEqualityComparer<T>
     {
@@ -60,7 +59,7 @@ namespace Test
 
         public int Compare(int x, int y)
         {
-            return -x.CompareTo(y);
+            return y.CompareTo(x);
         }
     }
 
@@ -69,6 +68,24 @@ namespace Test
         public int Compare(int x, int y)
         {
             throw new DeliberateTestException();
+        }
+    }
+
+    /// <summary>
+    /// Returns an extreme value from non-equal comparisons.
+    /// </summary>
+    /// <remarks>Helper for regression test against PLINQ's version of #2239 .</remarks>
+    /// <typeparam name="T">The type being compared.</typeparam>
+    internal class ExtremeComparer<T> : IComparer<T>
+    {
+        private IComparer<T> _def = Comparer<T>.Default;
+
+        public int Compare(T x, T y)
+        {
+            int direction = _def.Compare(x, y);
+            return direction == 0 ? 0 :
+                direction > 0 ? int.MaxValue :
+                int.MinValue;
         }
     }
 
@@ -102,6 +119,24 @@ namespace Test
         public int CompareTo(DelegatedComparable<T> other)
         {
             return _comparer.Compare(Value, other.Value);
+        }
+    }
+
+    internal struct NotComparable
+    {
+        private readonly int _value;
+
+        public int Value
+        {
+            get
+            {
+                return _value;
+            }
+        }
+
+        public NotComparable(int x)
+        {
+            _value = x;
         }
     }
 }

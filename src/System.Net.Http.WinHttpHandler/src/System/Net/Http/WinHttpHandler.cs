@@ -107,9 +107,9 @@ namespace System.Net.Http
         private object _lockObject = new object();
         private bool _doManualDecompressionCheck = false;
         private WinInetProxyHelper _proxyHelper = null;
-        private bool _automaticRedirection = true;
-        private int _maxAutomaticRedirections = 50;
-        private DecompressionMethods _automaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+        private bool _automaticRedirection = HttpHandlerDefaults.DefaultAutomaticRedirection;
+        private int _maxAutomaticRedirections = HttpHandlerDefaults.DefaultMaxAutomaticRedirections;
+        private DecompressionMethods _automaticDecompression = HttpHandlerDefaults.DefaultAutomaticDecompression;
         private CookieUsePolicy _cookieUsePolicy = CookieUsePolicy.UseInternalCookieStoreOnly;
         private CookieContainer _cookieContainer = null;
 
@@ -179,7 +179,7 @@ namespace System.Net.Http
                     throw new ArgumentOutOfRangeException(
                         "value",
                         value,
-                        string.Format(SR.net_http_value_must_be_greater_than, 0));
+                        SR.Format(SR.net_http_value_must_be_greater_than, 0));
                 }
 
                 CheckDisposedOrStarted();
@@ -415,7 +415,7 @@ namespace System.Net.Http
                     throw new ArgumentOutOfRangeException(
                         "value",
                         value,
-                        string.Format(SR.net_http_value_must_be_greater_than, 0));
+                        SR.Format(SR.net_http_value_must_be_greater_than, 0));
                 }
 
                 CheckDisposedOrStarted();
@@ -513,7 +513,7 @@ namespace System.Net.Http
                     throw new ArgumentOutOfRangeException(
                         "value",
                         value,
-                        string.Format(SR.net_http_value_must_be_greater_than, 0));
+                        SR.Format(SR.net_http_value_must_be_greater_than, 0));
                 }
 
                 CheckDisposedOrStarted();
@@ -535,7 +535,7 @@ namespace System.Net.Http
                     throw new ArgumentOutOfRangeException(
                         "value",
                         value,
-                        string.Format(SR.net_http_value_must_be_greater_than, 0));
+                        SR.Format(SR.net_http_value_must_be_greater_than, 0));
                 }
 
                 CheckDisposedOrStarted();
@@ -546,13 +546,12 @@ namespace System.Net.Http
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && !_disposed)
+            if (!_disposed)
             {
                 _disposed = true;
 
-                if (_sessionHandle != null)
+                if (disposing && _sessionHandle != null)
                 {
-                    _sessionHandle.DangerousRelease();
                     SafeWinHttpHandle.DisposeAndClearHandle(ref _sessionHandle);
                 }
             }
@@ -613,7 +612,7 @@ namespace System.Net.Http
             try
             {
                 Task.Factory.StartNew(
-                    StartRequest,
+                    s => ((RequestState)s).Handler.StartRequest(s),
                     state,
                     CancellationToken.None,
                     TaskCreationOptions.DenyChildAttach,
@@ -717,6 +716,17 @@ namespace System.Net.Http
                     }
 
                     state.RequestMessage.RequestUri = redirectUri;
+                    
+                    // Redirection to a new uri may require a new connection through a potentially different proxy.
+                    // If so, we will need to respond to additional 407 proxy auth demands and re-attach any
+                    // proxy credentials. The ProcessResponse() method looks at the state.LastStatusCode
+                    // before attaching proxy credentials and marking the HTTP request to be re-submitted.
+                    // So we need to reset the LastStatusCode remembered. Otherwise, it will see additional 407
+                    // responses as an indication that proxy auth failed and won't retry the HTTP request.
+                    if (state.LastStatusCode == HttpStatusCode.ProxyAuthenticationRequired)
+                    {
+                        state.LastStatusCode = 0;
+                    }
 
                     // For security reasons, we drop the server credential if it is a 
                     // NetworkCredential.  But we allow credentials in a CredentialCache
@@ -922,8 +932,6 @@ namespace System.Net.Http
 
         private void EnsureSessionHandleExists(RequestState state)
         {
-            bool ignore = false;
-
             if (_sessionHandle == null)
             {
                 lock (_lockObject)
@@ -978,8 +986,6 @@ namespace System.Net.Http
                             0);
                         if (!_sessionHandle.IsInvalid)
                         {
-                            _sessionHandle.DangerousAddRef(ref ignore);
-
                             return;
                         }
 
@@ -1007,8 +1013,6 @@ namespace System.Net.Http
                                 SR.net_http_client_execution_error,
                                 WinHttpException.CreateExceptionUsingLastError());
                         }
-
-                        _sessionHandle.DangerousAddRef(ref ignore);
                     }
                 }
             }
@@ -1072,16 +1076,13 @@ namespace System.Net.Http
             Exception savedException = null;
             SafeWinHttpHandle connectHandle = null;
             SafeWinHttpHandle requestHandle = null;
-            WinHttpRequestStream requestStream = null;
             GCHandle requestStateHandle = new GCHandle();
 
             if (state.CancellationToken.IsCancellationRequested)
             {
-                state.Tcs.TrySetCanceled();
+                state.Tcs.TrySetCanceled(state.CancellationToken);
                 return;
             }
-
-            var cancellationTokenRegistration = state.CancellationToken.Register(() => { state.Tcs.TrySetCanceled(); });
 
             try
             {
@@ -1104,6 +1105,7 @@ namespace System.Net.Http
                         SR.net_http_client_execution_error,
                         WinHttpException.CreateExceptionUsingLastError());
                 }
+                connectHandle.SetParentHandle(_sessionHandle);
 
                 if (state.RequestMessage.RequestUri.Scheme == UriSchemeHttps)
                 {
@@ -1129,7 +1131,8 @@ namespace System.Net.Http
                         SR.net_http_client_execution_error,
                         WinHttpException.CreateExceptionUsingLastError());
                 }
-
+                requestHandle.SetParentHandle(connectHandle);
+                
                 state.RequestHandle = requestHandle;
 
                 // Set callback function.
@@ -1147,14 +1150,13 @@ namespace System.Net.Http
 
                 uint proxyAuthScheme = 0;
                 uint serverAuthScheme = 0;
-                HttpStatusCode lastStatusCode = 0;
                 bool retryRequest = false;
 
                 do
                 {
                     state.CancellationToken.ThrowIfCancellationRequested();
 
-                    PreAuthenticateRequest(state, requestHandle, proxyAuthScheme, ref lastStatusCode);
+                    PreAuthenticateRequest(state, requestHandle, proxyAuthScheme);
 
                     // Send a request.
                     if (!Interop.WinHttp.WinHttpSendRequest(
@@ -1172,11 +1174,13 @@ namespace System.Net.Http
                     // Send request body if present.
                     if (state.RequestMessage.Content != null)
                     {
-                        requestStream = new WinHttpRequestStream(requestHandle, chunkedModeForSend);
-                        await state.RequestMessage.Content.CopyToAsync(
-                            requestStream,
-                            state.TransportContext).ConfigureAwait(false);
-                        requestStream.Flush();
+                        using (var requestStream = new WinHttpRequestStream(requestHandle, chunkedModeForSend))
+                        {
+                            await state.RequestMessage.Content.CopyToAsync(
+                                requestStream,
+                                state.TransportContext).ConfigureAwait(false);
+                            requestStream.EndUpload();
+                        }
                     }
 
                     state.CancellationToken.ThrowIfCancellationRequested();
@@ -1211,7 +1215,6 @@ namespace System.Net.Http
                             requestHandle,
                             ref proxyAuthScheme,
                             ref serverAuthScheme,
-                            ref lastStatusCode,
                             out retryRequest);
                     }
                 } while (retryRequest);
@@ -1223,7 +1226,7 @@ namespace System.Net.Http
                 state.CancellationToken.ThrowIfCancellationRequested();
 
                 // Create HttpResponseMessage object.
-                responseMessage = CreateResponseMessage(connectHandle, requestHandle, state.RequestMessage);
+                responseMessage = CreateResponseMessage(requestHandle, state.RequestMessage);
             }
             catch (Exception ex)
             {
@@ -1242,7 +1245,10 @@ namespace System.Net.Http
 
                 // Clear callback function in WinHTTP to prevent
                 // further native callbacks as we clean up the objects.
-                SetStatusCallback(requestHandle, null);
+                if (requestHandle != null)
+                {
+                    SetStatusCallback(requestHandle, null);
+                }
             }
 
             if (requestStateHandle.IsAllocated)
@@ -1250,12 +1256,6 @@ namespace System.Net.Http
                 requestStateHandle.Free();
             }
 
-            if (requestStream != null)
-            {
-                requestStream.Dispose();
-            }
-
-            SafeWinHttpHandle.DisposeAndClearHandle(ref requestHandle);
             SafeWinHttpHandle.DisposeAndClearHandle(ref connectHandle);
 
             // Move the task to a terminal state.
@@ -1267,8 +1267,6 @@ namespace System.Net.Http
             {
                 HandleAsyncException(state, savedException);
             }
-
-            cancellationTokenRegistration.Dispose();
         }
 
         private void ProcessResponse(
@@ -1276,7 +1274,6 @@ namespace System.Net.Http
             SafeWinHttpHandle requestHandle,
             ref uint proxyAuthScheme,
             ref uint serverAuthScheme,
-            ref HttpStatusCode lastStatusCode,
             out bool retryRequest)
         {
             retryRequest = false;
@@ -1293,14 +1290,14 @@ namespace System.Net.Http
             switch (statusCode)
             {
                 case HttpStatusCode.Unauthorized:
-                    if (state.ServerCredentials == null || lastStatusCode == HttpStatusCode.Unauthorized)
+                    if (state.ServerCredentials == null || state.LastStatusCode == HttpStatusCode.Unauthorized)
                     {
                         // Either we don't have server credentials or we already tried 
                         // to set the credentials and it failed before.
                         // So we will let the 401 be the final status code returned.
                         break;
                     }
-                    lastStatusCode = statusCode;
+                    state.LastStatusCode = statusCode;
 
                     // Determine authorization scheme to use. We ignore the firstScheme
                     // parameter which is included in the supportedSchemes flags already.
@@ -1337,12 +1334,12 @@ namespace System.Net.Http
                     break;
 
                 case HttpStatusCode.ProxyAuthenticationRequired:
-                    if (lastStatusCode == HttpStatusCode.ProxyAuthenticationRequired)
+                    if (state.LastStatusCode == HttpStatusCode.ProxyAuthenticationRequired)
                     {
                         // We tried already to set the credentials.
                         break;
                     }
-                    lastStatusCode = statusCode;
+                    state.LastStatusCode = statusCode;
 
                     // Determine authorization scheme to use. We ignore the firstScheme
                     // parameter which is included in the supportedSchemes flags already.
@@ -1381,8 +1378,7 @@ namespace System.Net.Http
         private void PreAuthenticateRequest(
             RequestState state,
             SafeWinHttpHandle requestHandle,
-            uint proxyAuthScheme,
-            ref HttpStatusCode lastStatusCode)
+            uint proxyAuthScheme)
         {
             // Set proxy credentials if we have them.
             // If a proxy authentication challenge was responded to, reset
@@ -1416,7 +1412,7 @@ namespace System.Net.Http
                         state.RequestMessage.RequestUri,
                         authScheme,
                         Interop.WinHttp.WINHTTP_AUTH_TARGET_SERVER);
-                    lastStatusCode = HttpStatusCode.Unauthorized; // Remember we already set the creds.
+                    state.LastStatusCode = HttpStatusCode.Unauthorized; // Remember we already set the creds.
                 }
             }
         }
@@ -1826,10 +1822,7 @@ namespace System.Net.Http
             }
         }
 
-        private HttpResponseMessage CreateResponseMessage(
-            SafeWinHttpHandle connectHandle,
-            SafeWinHttpHandle requestHandle,
-            HttpRequestMessage request)
+        private HttpResponseMessage CreateResponseMessage(SafeWinHttpHandle requestHandle, HttpRequestMessage request)
         {
             var response = new HttpResponseMessage();
             bool useDeflateDecompression = false;
@@ -1864,12 +1857,11 @@ namespace System.Net.Http
                     Interop.WinHttp.WINHTTP_QUERY_CONTENT_ENCODING);
                 if (!string.IsNullOrEmpty(contentEncoding))
                 {
-                    contentEncoding = contentEncoding.ToUpperInvariant();
-                    if (contentEncoding.Contains(EncodingNameDeflate))
+                    if (contentEncoding.IndexOf(EncodingNameDeflate, StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         useDeflateDecompression = true;
                     }
-                    else if (contentEncoding.Contains(EncodingNameGzip))
+                    else if (contentEncoding.IndexOf(EncodingNameGzip, StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         useGzipDecompression = true;
                     }
@@ -1877,7 +1869,7 @@ namespace System.Net.Http
             }
 
             // Create response stream and wrap it in a StreamContent object.
-            var responseStream = new WinHttpResponseStream(_sessionHandle, connectHandle, requestHandle);
+            var responseStream = new WinHttpResponseStream(requestHandle);
             Stream decompressedStream = responseStream;
             if (_doManualDecompressionCheck)
             {
@@ -2056,7 +2048,7 @@ namespace System.Net.Http
             if (state.CancellationToken.IsCancellationRequested)
             {
                 // If the exception was due to the cancellation token being canceled, throw cancellation exception.
-                state.Tcs.TrySetCanceled();
+                state.Tcs.TrySetCanceled(state.CancellationToken);
             }
             else if (ex is WinHttpException || ex is IOException)
             {
@@ -2151,6 +2143,8 @@ namespace System.Net.Http
             public IWebProxy Proxy { get; set; }
 
             public ICredentials ServerCredentials { get; set; }
+            
+            public HttpStatusCode LastStatusCode { get; set; }
         }
     }
 }

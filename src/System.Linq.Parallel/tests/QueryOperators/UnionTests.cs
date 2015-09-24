@@ -1,19 +1,18 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using Xunit;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     public class UnionTests
     {
         private const int DuplicateFactor = 8;
 
         // Get two ranges, with the right starting where the left ends
-        public static IEnumerable<object[]> UnionUnorderedData(object[] leftCounts, object[] rightCounts)
+        public static IEnumerable<object[]> UnionUnorderedData(int[] leftCounts, int[] rightCounts)
         {
             foreach (object[] parms in UnorderedSources.BinaryRanges(leftCounts.Cast<int>(), (l, r) => l, rightCounts.Cast<int>()))
             {
@@ -23,7 +22,7 @@ namespace Test
 
         // Union returns only the ordered portion ordered.  See Issue #1331
         // Get two ranges, both ordered.
-        public static IEnumerable<object[]> UnionData(object[] leftCounts, object[] rightCounts)
+        public static IEnumerable<object[]> UnionData(int[] leftCounts, int[] rightCounts)
         {
             foreach (object[] parms in UnionUnorderedData(leftCounts, rightCounts))
             {
@@ -32,7 +31,7 @@ namespace Test
         }
 
         // Get two ranges, with only the left being ordered.
-        public static IEnumerable<object[]> UnionFirstOrderedData(object[] leftCounts, object[] rightCounts)
+        public static IEnumerable<object[]> UnionFirstOrderedData(int[] leftCounts, int[] rightCounts)
         {
             foreach (object[] parms in UnionUnorderedData(leftCounts, rightCounts))
             {
@@ -41,7 +40,7 @@ namespace Test
         }
 
         // Get two ranges, with only the right being ordered.
-        public static IEnumerable<object[]> UnionSecondOrderedData(object[] leftCounts, object[] rightCounts)
+        public static IEnumerable<object[]> UnionSecondOrderedData(int[] leftCounts, int[] rightCounts)
         {
             foreach (object[] parms in UnionUnorderedData(leftCounts, rightCounts))
             {
@@ -51,7 +50,7 @@ namespace Test
 
         // Get two ranges, both sourced from arrays, with duplicate items in each array.
         // Used in distinctness tests, in contrast to relying on a Select predicate to generate duplicate items.
-        public static IEnumerable<object[]> UnionSourceMultipleData(object[] counts)
+        public static IEnumerable<object[]> UnionSourceMultipleData(int[] counts)
         {
             foreach (int leftCount in counts.Cast<int>())
             {
@@ -538,6 +537,17 @@ namespace Test
             Assert.Throws<NotSupportedException>(() => ParallelEnumerable.Range(0, 1).Union(Enumerable.Range(0, 1)));
             Assert.Throws<NotSupportedException>(() => ParallelEnumerable.Range(0, 1).Union(Enumerable.Range(0, 1), null));
 #pragma warning restore 618
+        }
+
+        [Fact]
+        // Should not get the same setting from both operands.
+        public static void Union_NoDuplicateSettings()
+        {
+            CancellationToken t = new CancellationTokenSource().Token;
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithCancellation(t).Union(ParallelEnumerable.Range(0, 1).WithCancellation(t)));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithDegreeOfParallelism(1).Union(ParallelEnumerable.Range(0, 1).WithDegreeOfParallelism(1)));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithExecutionMode(ParallelExecutionMode.Default).Union(ParallelEnumerable.Range(0, 1).WithExecutionMode(ParallelExecutionMode.Default)));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithMergeOptions(ParallelMergeOptions.Default).Union(ParallelEnumerable.Range(0, 1).WithMergeOptions(ParallelMergeOptions.Default)));
         }
 
         [Fact]

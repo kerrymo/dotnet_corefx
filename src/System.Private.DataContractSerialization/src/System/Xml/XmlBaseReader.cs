@@ -832,6 +832,12 @@ namespace System.Xml
                 {
                     if (_node.NodeType != XmlNodeType.Text && _node.NodeType != XmlNodeType.CDATA)
                         break;
+
+                    if (_trailByteCount > 0)
+                    {
+                        break;
+                    }
+
                     if (_value == null)
                     {
                         if (!_node.Value.IsWhitespace())
@@ -1385,9 +1391,17 @@ namespace System.Xml
                 {
                     int actualCharCount;
                     if (readContent)
+                    {
                         actualCharCount = ReadContentAsChars(chars, charCount, maxCharCount - charCount);
+                        // When deserializing base64 content which contains new line chars (CR, LF) chars from ReadObject, the reader reads in chunks of base64 content, LF char, base64 content, LF char and so on
+                        // Relying on encoding.GetBytes' exception to handle LF char would result in performance degradation so skipping LF char here
+                        if (actualCharCount == 1 && chars[charCount] == '\n')
+                            continue;
+                    }
                     else
+                    {
                         actualCharCount = ReadValueChunk(chars, charCount, maxCharCount - charCount);
+                    }
                     if (actualCharCount == 0)
                         break;
                     charCount += actualCharCount;

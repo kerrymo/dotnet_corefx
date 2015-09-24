@@ -1,22 +1,20 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     public class DegreeOfParallelismTests
     {
         // If ThreadPool becomes available, uncomment the below
         //private static ThreadPoolManager _poolManager = new ThreadPoolManager();
 
-        public static IEnumerable<object[]> DegreeData(object[] counts, object[] degrees)
+        public static IEnumerable<object[]> DegreeData(int[] counts, int[] degrees)
         {
             foreach (object[] results in UnorderedSources.Ranges(counts.Cast<int>(), x => degrees.Cast<int>().DefaultIfEmpty(x)))
             {
@@ -24,7 +22,7 @@ namespace Test
             }
         }
 
-        public static IEnumerable<object[]> NotLoadBalancedDegreeData(object[] counts, object[] degrees)
+        public static IEnumerable<object[]> NotLoadBalancedDegreeData(int[] counts, int[] degrees)
         {
             foreach (object[] results in DegreeData(counts, degrees))
             {
@@ -53,7 +51,7 @@ namespace Test
         }
 
         [Theory]
-        [MemberData("DegreeData", new[] { 1, 4, 32 }, new object[] { })]
+        [MemberData("DegreeData", new[] { 1, 4, 32 }, new int[] { })]
         [OuterLoop]
         public static void DegreeOfParallelism_Barrier(Labeled<ParallelQuery<int>> labeled, int count, int degree)
         {
@@ -79,7 +77,7 @@ namespace Test
         }
 
         [Theory]
-        [MemberData("DegreeData", new[] { 1, 4 }, new object[] { })]
+        [MemberData("DegreeData", new[] { 1, 4 }, new int[] { })]
         [MemberData("DegreeData", new[] { 32 }, new[] { 4 })]
         // Without the ability to ask the thread pool to create a minimum number of threads ahead of time,
         // higher thread counts take a prohibitive amount of time spooling them up.
@@ -100,7 +98,7 @@ namespace Test
         }
 
         [Theory]
-        [MemberData("NotLoadBalancedDegreeData", new[] { 1, 4 }, new object[] { })]
+        [MemberData("NotLoadBalancedDegreeData", new[] { 1, 4 }, new int[] { })]
         [MemberData("NotLoadBalancedDegreeData", new[] { 32, 512, 1024 }, new[] { 4, 16 })]
         [OuterLoop]
         public static void DegreeOfParallelism_Aggregate_Accumulator(Labeled<ParallelQuery<int>> labeled, int count, int degree)
@@ -118,7 +116,7 @@ namespace Test
         }
 
         [Theory]
-        [MemberData("NotLoadBalancedDegreeData", new[] { 1, 4 }, new object[] { })]
+        [MemberData("NotLoadBalancedDegreeData", new[] { 1, 4 }, new int[] { })]
         [MemberData("NotLoadBalancedDegreeData", new[] { 32, 512, 1024 }, new[] { 4, 16 })]
         [OuterLoop]
         public static void DegreeOfParallelism_Aggregate_SeedFunction(Labeled<ParallelQuery<int>> labeled, int count, int degree)

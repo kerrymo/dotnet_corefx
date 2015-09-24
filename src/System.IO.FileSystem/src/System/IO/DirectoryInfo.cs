@@ -8,7 +8,7 @@ using System.Security;
 
 namespace System.IO
 {
-    public sealed class DirectoryInfo : FileSystemInfo
+    public sealed partial class DirectoryInfo : FileSystemInfo
     {
         [System.Security.SecuritySafeCritical]
         public DirectoryInfo(String path)
@@ -23,12 +23,12 @@ namespace System.IO
         }
 
         [System.Security.SecuritySafeCritical]
-        internal DirectoryInfo(String fullPath, IFileSystemObject fileSystemObject) : base(fileSystemObject)
+        internal DirectoryInfo(String fullPath, String originalPath)
         {
-            Debug.Assert(PathHelpers.GetRootLength(fullPath) > 0, "fullPath must be fully qualified!");
-            
+            Debug.Assert(Path.IsPathRooted(fullPath), "fullPath must be fully qualified!");
+
             // Fast path when we know a DirectoryInfo exists.
-            OriginalPath = Path.GetFileName(fullPath);
+            OriginalPath = originalPath ?? Path.GetFileName(fullPath);
             FullPath = fullPath;
             DisplayPath = GetDisplayName(OriginalPath, FullPath);
         }
@@ -87,7 +87,7 @@ namespace System.IO
             String newDirs = Path.Combine(FullPath, path);
             String fullPath = Path.GetFullPath(newDirs);
 
-            if (0 != String.Compare(FullPath, 0, fullPath, 0, FullPath.Length, PathInternal.GetComparison()))
+            if (0 != String.Compare(FullPath, 0, fullPath, 0, FullPath.Length, PathInternal.StringComparison))
             {
                 throw new ArgumentException(SR.Format(SR.Argument_InvalidSubPath, path, DisplayPath), "path");
             }
@@ -392,7 +392,13 @@ namespace System.IO
             else
                 fullSourcePath = FullPath + PathHelpers.DirectorySeparatorCharAsString;
 
-            StringComparison pathComparison = PathInternal.GetComparison();
+            if (PathInternal.IsDirectoryTooLong(fullSourcePath))
+                throw new PathTooLongException(SR.IO_PathTooLong);
+
+            if (PathInternal.IsDirectoryTooLong(fullDestDirName))
+                throw new PathTooLongException(SR.IO_PathTooLong);
+
+            StringComparison pathComparison = PathInternal.StringComparison;
             if (String.Equals(fullSourcePath, fullDestDirName, pathComparison))
                 throw new IOException(SR.IO_SourceDestMustBeDifferent);
 

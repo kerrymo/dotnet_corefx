@@ -1,3 +1,6 @@
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -244,11 +247,15 @@ namespace Internal.Cryptography.Pal
                 return lengthOrLengthLength;
             }
 
+            // The one byte which was lengthLength, plus the number of bytes it said to consume.
             bytesConsumed = 1 + (lengthOrLengthLength & 0x7F);
-            int end = bytesConsumed + 1;
-            int accum = 0;
 
-            for (int i = 1; i < end; i++)
+            int end = offset + bytesConsumed;
+            int accum = 0;
+            
+            // data[offset] is lengthLength, so start at data[offset + 1] and stop before
+            // data[offset + 1 + lengthLength], aka data[end].
+            for (int i = offset + 1; i < end; i++)
             {
                 accum <<= 8;
                 accum += data[i];

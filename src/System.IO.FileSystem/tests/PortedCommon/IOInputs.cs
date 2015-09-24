@@ -5,20 +5,39 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 internal static class IOInputs
 {
     // see: http://msdn.microsoft.com/en-us/library/aa365247.aspx
-    private static readonly char[] s_invalidFileNameChars = Interop.IsWindows ?
+    private static readonly char[] s_invalidFileNameChars = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ?
         new char[] { '\"', '<', '>', '|', '\0', (Char)1, (Char)2, (Char)3, (Char)4, (Char)5, (Char)6, (Char)7, (Char)8, (Char)9, (Char)10, (Char)11, (Char)12, (Char)13, (Char)14, (Char)15, (Char)16, (Char)17, (Char)18, (Char)19, (Char)20, (Char)21, (Char)22, (Char)23, (Char)24, (Char)25, (Char)26, (Char)27, (Char)28, (Char)29, (Char)30, (Char)31, ':', '*', '?' } :
         new char[] { '\0' };
 
-    // Unix values vary system to system; just using really long values here likely to be more than on the average system
-    public static readonly int MaxDirectory = Interop.IsWindows ? 247 : 10000; // Does not include trailing \0. This the maximum length that can be passed to APIs taking directory names, such as Directory.CreateDirectory, Directory.Move
-    public static readonly int MaxPath = Interop.IsWindows ? 259 : 10000;      // Does not include trailing \0.
-    public static readonly int MaxComponent = Interop.IsWindows ? 255 : 10000;
+    public static bool SupportsSettingCreationTime { get { return RuntimeInformation.IsOSPlatform(OSPlatform.Windows); } }
+    public static bool SupportsGettingCreationTime { get { return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) | RuntimeInformation.IsOSPlatform(OSPlatform.OSX); } }
+    public static bool CaseSensitive { get { return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) | RuntimeInformation.IsOSPlatform(OSPlatform.OSX); } }
+    public static bool CaseInsensitive { get { return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) | RuntimeInformation.IsOSPlatform(OSPlatform.OSX); } }
+
+    // Max path length (minus trailing \0). Unix values vary system to system; just using really long values here likely to be more than on the average system.
+    public static readonly int MaxPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 259 : 10000;
+
+    // Same as MaxPath on Unix
+    public static readonly int MaxLongPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? MaxExtendedPath : MaxPath;
+
+    // Windows specific, this is the maximum length that can be passed to APIs taking directory names, such as Directory.CreateDirectory & Directory.Move.
+    // Does not include the trailing \0.
+    // We now do the appropriate wrapping to allow creating longer directories. Like MaxPath, this is a legacy restriction.
+    public static readonly int MaxDirectory = 247;
+
+    // Windows specific, this is the maximum length that can be passed using extended syntax. Does not include the trailing \0.
+    public static readonly int MaxExtendedPath = short.MaxValue - 1;
+
+
+    public const int MaxComponent = 255;
+
+    public const string ExtendedPrefix = @"\\?\";
+    public const string ExtendedUncPrefix = @"\\?\UNC\";
 
     public static IEnumerable<string> GetValidPathComponentNames()
     {
@@ -39,13 +58,8 @@ internal static class IOInputs
         yield return "V1.0.0.0000";
     }
 
-    public static IEnumerable<string> GetNonSignificantTrailingWhiteSpace()
+    public static IEnumerable<string> GetControlWhiteSpace()
     {
-        yield return " ";
-        yield return "  ";
-        yield return "   ";
-        yield return "    ";
-        yield return "     ";
         yield return "\t";
         yield return "\t\t";
         yield return "\t\t\t";
@@ -58,6 +72,20 @@ internal static class IOInputs
         yield return "\n\t\n\t";
     }
 
+    public static IEnumerable<string> GetSimpleWhiteSpace()
+    {
+        yield return " ";
+        yield return "  ";
+        yield return "   ";
+        yield return "    ";
+        yield return "     ";
+    }
+
+    public static IEnumerable<string> GetWhiteSpace()
+    {
+        return GetControlWhiteSpace().Concat(GetSimpleWhiteSpace());
+    }
+
     public static IEnumerable<string> GetUncPathsWithoutShareName()
     {
         foreach (char slash in new[] { Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar })
@@ -68,11 +96,11 @@ internal static class IOInputs
             yield return slashes + new string(slash, 5);
             yield return slashes + "S";
             yield return slashes + "S ";
-            yield return slashes + "Server";
-            yield return slashes + "Server " + slash;
-            yield return slashes + "Server " + new string(slash, 2);
-            yield return slashes + "Server" + slash + " ";
-            yield return slashes + "Server" + slash + slash + " ";
+            yield return slashes + "LOCALHOST";
+            yield return slashes + "LOCALHOST " + slash;
+            yield return slashes + "LOCALHOST " + new string(slash, 2);
+            yield return slashes + "LOCALHOST" + slash + " ";
+            yield return slashes + "LOCALHOST" + slash + slash + " ";
         }
     }
 
@@ -84,7 +112,7 @@ internal static class IOInputs
             yield return deviceName;
             yield return Path.Combine(root, deviceName);
             yield return Path.Combine(root, "Directory", deviceName);
-            yield return Path.Combine(new string(Path.DirectorySeparatorChar, 2), "Server", deviceName);
+            yield return Path.Combine(new string(Path.DirectorySeparatorChar, 2), "LOCALHOST", deviceName);
         }
     }
 
@@ -121,8 +149,11 @@ internal static class IOInputs
         // NOTE: That I/O treats "file"/http" specially and throws ArgumentException.
         // Otherwise, it treats all other urls as alternative data streams
 
-        if (Interop.IsWindows) // alternate data streams, drive labels, etc.
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) // alternate data streams, drive labels, etc.
         {
+            yield return "\0";
+            yield return "middle\0path";
+            yield return "trailing\0";
             yield return @":";
             yield return @" :";
             yield return @"  :";
@@ -148,9 +179,7 @@ internal static class IOInputs
             yield return @"file:///C|/My Documents/ALetter.html";
             yield return @"\\?\";
             yield return @"\\?\UNC\";
-            yield return @"\\?\UNC\Server";
-            yield return @"\\?\UNC\Server\Share";
-            yield return @"\\?\UNC\Server\Share\FileName.txt";
+            yield return @"\\?\UNC\LOCALHOST";
 
             /* Bug 1011730.  CoreCLR checks : before invalid characters and throws NotSupportedException for these.
             yield return @"\\?\C:";
@@ -158,6 +187,12 @@ internal static class IOInputs
             yield return @"\\?\C:\Windows";
             yield return @"\\?\C:\Windows\FileName.txt";
             */
+        }
+        else
+        {
+            yield return "\0";
+            yield return "middle\0path";
+            yield return "trailing\0";
         }
 
         foreach (char c in s_invalidFileNameChars)
@@ -177,33 +212,37 @@ internal static class IOInputs
         yield return String.Format(@"C:\{0}\Filename.txt", component);
         yield return String.Format(@"C:\{0}\Filename.txt\", component);
         yield return String.Format(@"\\{0}\Share", component);
-        yield return String.Format(@"\\Server\{0}", component);
-        yield return String.Format(@"\\Server\{0}\FileName.txt", component);
-        yield return String.Format(@"\\Server\Share\{0}", component);
+        yield return String.Format(@"\\LOCALHOST\{0}", component);
+        yield return String.Format(@"\\LOCALHOST\{0}\FileName.txt", component);
+        yield return String.Format(@"\\LOCALHOST\Share\{0}", component);
     }
 
-    public static IEnumerable<string> GetPathsLongerThanMaxDirectory()
+    public static IEnumerable<string> GetPathsLongerThanMaxDirectory(string rootPath)
     {
-        yield return GetLongPath(MaxDirectory + 1);
-        yield return GetLongPath(MaxDirectory + 2);
-        yield return GetLongPath(MaxDirectory + 3);
+        yield return GetLongPath(rootPath, MaxDirectory + 1);
+        yield return GetLongPath(rootPath, MaxDirectory + 2);
+        yield return GetLongPath(rootPath, MaxDirectory + 3);
     }
 
-    public static IEnumerable<string> GetPathsLongerThanMaxPath()
+    public static IEnumerable<string> GetPathsLongerThanMaxPath(string rootPath, bool useExtendedSyntax = false)
     {
-        yield return GetLongPath(MaxPath + 1);
-        yield return GetLongPath(MaxPath + 2);
-        yield return GetLongPath(MaxPath + 3);
-        yield return GetLongPath(Int16.MaxValue);
-        yield return GetLongPath(Int16.MaxValue + 1);
+        yield return GetLongPath(rootPath, MaxPath + 1, useExtendedSyntax);
+        yield return GetLongPath(rootPath, MaxPath + 2, useExtendedSyntax);
+        yield return GetLongPath(rootPath, MaxPath + 3, useExtendedSyntax);
     }
 
-    private static string GetLongPath(int characterCount)
+    public static IEnumerable<string> GetPathsLongerThanMaxLongPath(string rootPath, bool useExtendedSyntax = false)
     {
-        return IOServices.GetPath(characterCount).FullPath;
+        yield return GetLongPath(rootPath, MaxExtendedPath + 1 - (useExtendedSyntax ? 0 : ExtendedPrefix.Length), useExtendedSyntax);
+        yield return GetLongPath(rootPath, MaxExtendedPath + 2 - (useExtendedSyntax ? 0 : ExtendedPrefix.Length), useExtendedSyntax);
     }
 
-    private static IEnumerable<string> GetReservedDeviceNames()
+    private static string GetLongPath(string rootPath, int characterCount, bool extended = false)
+    {
+        return IOServices.GetPath(rootPath, characterCount, extended).FullPath;
+    }
+
+    public static IEnumerable<string> GetReservedDeviceNames()
     {   // See: http://msdn.microsoft.com/en-us/library/aa365247.aspx
         yield return "CON";
         yield return "AUX";

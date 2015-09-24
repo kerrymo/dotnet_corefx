@@ -5,6 +5,7 @@ internal static partial class Interop
 {
     internal static class Libraries
     {
+        internal const string Advapi32 = "advapi32.dll";
         internal const string BCrypt = "BCrypt.dll";
         internal const string Console_L1 = "api-ms-win-core-console-l1-1-0.dll";
         internal const string Console_L2 = "api-ms-win-core-console-l2-1-0.dll";
@@ -17,6 +18,7 @@ internal static partial class Interop
         internal const string Handle = "api-ms-win-core-handle-l1-1-0.dll";
         internal const string Heap = "api-ms-win-core-heap-obsolete-l1-1-0.dll";
         internal const string IO = "api-ms-win-core-io-l1-1-0.dll";
+        internal const string IpHlpApi = "iphlpapi.dll";
         internal const string Kernel32 = "kernel32.dll";
         internal const string Kernel32_L1 = "api-ms-win-core-kernel32-legacy-l1-1-1.dll";
         internal const string Kernel32_L2 = "api-ms-win-core-kernel32-legacy-l1-1-0.dll";
@@ -24,6 +26,7 @@ internal static partial class Interop
         internal const string Localization = "api-ms-win-core-localization-l1-2-0.dll";
         internal const string Memory_L1_0 = "api-ms-win-core-memory-l1-1-0.dll";
         internal const string Memory_L1_1 = "api-ms-win-core-memory-l1-1-1.dll";
+        internal const string NCrypt = "ncrypt.dll";
         internal const string NtDll = "ntdll.dll";
         internal const string OleAut32 = "oleaut32.dll";
         internal const string Pipe = "api-ms-win-core-namedpipe-l1-1-0.dll";
@@ -38,6 +41,7 @@ internal static partial class Interop
         internal const string Psapi_Obsolete = "api-ms-win-core-psapi-obsolete-l1-1-0.dll";
         internal const string Registry_L1 = "api-ms-win-core-registry-l1-1-0.dll";
         internal const string Registry_L2 = "api-ms-win-core-registry-l2-1-0.dll";
+        internal const string Secur32 = "Secur32.dll";
         internal const string SecurityBase = "api-ms-win-security-base-l1-1-0.dll";
         internal const string SecurityCpwl = "api-ms-win-security-cpwl-l1-1-0.dll";
         internal const string SecurityLsa = "api-ms-win-security-lsalookup-l2-1-0.dll";
@@ -53,7 +57,9 @@ internal static partial class Interop
         internal const string User32 = "user32.dll";
         internal const string Version = "api-ms-win-core-version-l1-1-0.dll";
         internal const string WinHttp = "winhttp.dll";
+        internal const string Winsock = "Ws2_32.dll";
         internal const string Wow64 = "api-ms-win-core-wow64-l1-1-0.dll";
+        internal const string Ws2_32 = "ws2_32.dll";
         internal const string Zlib = "clrcompression.dll";
     }
 }

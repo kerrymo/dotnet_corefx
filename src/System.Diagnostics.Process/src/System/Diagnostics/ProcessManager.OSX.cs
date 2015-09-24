@@ -45,7 +45,7 @@ namespace System.Diagnostics
             }
 
             // Get the sessionId for the given pid, getsid returns -1 on error
-            int sessionId = Interop.libc.getsid(pid);
+            int sessionId = Interop.Sys.GetSid(pid);
             if (sessionId != -1)
                 procInfo.SessionId = sessionId;
             
@@ -56,8 +56,8 @@ namespace System.Diagnostics
                 var ti = new ThreadInfo()
                 {
                     _processId = pid,
-                    _threadId = (int)t.Key, // The OS X thread ID is 64-bits, but we're forced to truncate due to the public API signature
-                    _basePriority = 0,
+                    _threadId = t.Key,
+                    _basePriority = procInfo.BasePriority,
                     _startAddress = IntPtr.Zero
                 };
 

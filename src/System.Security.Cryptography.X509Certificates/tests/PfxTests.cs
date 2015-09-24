@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.IO;
+using Test.Cryptography;
 using Xunit;
 
 namespace System.Security.Cryptography.X509Certificates.Tests
@@ -9,7 +10,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
     public static class PfxTests
     {
         [Fact]
-        [ActiveIssue(1993, PlatformID.AnyUnix)]
         public static void TestConstructor()
         {
             byte[] expectedThumbprint = "71cb4e2b02738ad44f8b382c93bd17ba665f9914".HexToByteArray();
@@ -24,7 +24,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
         }
 
         [Fact]
-        [ActiveIssue(1993, PlatformID.AnyUnix)]
         public static void TestRawData()
         {
             byte[] expectedRawData = (
@@ -58,7 +57,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
         }
 
         [Fact]
-        [ActiveIssue(1993, PlatformID.AnyUnix)]
+        [ActiveIssue(2583, PlatformID.Windows)]
         public static void TestPrivateKey()
         {
             using (var c = new X509Certificate2(TestData.PfxData, TestData.PfxDataPassword))
@@ -66,53 +65,29 @@ namespace System.Security.Cryptography.X509Certificates.Tests
                 bool hasPrivateKey = c.HasPrivateKey;
                 Assert.True(hasPrivateKey);
 
-                RSACryptoServiceProvider rsa = (RSACryptoServiceProvider)(c.PrivateKey);
-
-                byte[] hash = new byte[20];
-                byte[] sig = rsa.SignHash(hash, "SHA1");
-                Assert.Equal(s_expectedSig, sig);
+                using (RSA rsa = c.GetRSAPrivateKey())
+                {
+                    byte[] hash = new byte[20];
+                    byte[] sig = rsa.SignHash(hash, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
+                    Assert.Equal(s_expectedSig, sig);
+                }
             }
         }
 
         [Fact]
-        [ActiveIssue(1993, PlatformID.AnyUnix)]
-        public static void TestSetPrivateKey()
+        [ActiveIssue(2885, PlatformID.Windows)]
+        public static void ExportWithPrivateKey()
         {
-            X509Certificate2 current;
-
-            using (var c1 = new X509Certificate2(TestData.PfxData, TestData.PfxDataPassword))
+            using (var cert = new X509Certificate2(TestData.PfxData, TestData.PfxDataPassword, X509KeyStorageFlags.Exportable))
             {
-                current = c1;
-                RSACryptoServiceProvider rsa = (RSACryptoServiceProvider)(current.PrivateKey);
+                const string password = "NotVerySecret";
 
-                byte[] hash = new byte[20];
+                byte[] pkcs12 = cert.Export(X509ContentType.Pkcs12, password);
 
-                byte[] sig = rsa.SignHash(hash, "SHA1");
-                Assert.Equal(s_expectedSig, sig);
-
-                current.PrivateKey = null;
-                // Retrieving the private key after setting it retrieves a cached copy of the AsymmetricAlgorithm object which tells us nothing
-                // about whether the actual private key was set in the underlying CAPI object. To make this a real test, extract the underlying CAPI object
-                // and wrap it in a new X509Certificate2 object before proceeding.
-
-                using (X509Certificate2 c2 = current.Rewrap())
+                using (var certFromPfx = new X509Certificate2(pkcs12, password))
                 {
-                    current = c2;
-                    Assert.False(current.HasPrivateKey);
-                    Assert.Null(current.PrivateKey);
-
-                    current.PrivateKey = rsa;
-
-                    using (X509Certificate2 c3 = current.Rewrap())
-                    {
-                        current = c3;
-                        rsa = (RSACryptoServiceProvider)(current.PrivateKey);
-
-                        hash = new byte[20];
-
-                        sig = rsa.SignHash(hash, "SHA1");
-                        Assert.Equal(s_expectedSig, sig);
-                    }
+                    Assert.True(certFromPfx.HasPrivateKey);
+                    Assert.Equal(cert, certFromPfx);
                 }
             }
         }

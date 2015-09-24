@@ -511,6 +511,7 @@ namespace System.Diagnostics
                     {
                         newThreadsArray[i] = new ProcessThread(_isRemoteMachine, _processId, (ThreadInfo)_processInfo._threadInfoList[i]);
                     }
+
                     ProcessThreadCollection newThreads = new ProcessThreadCollection(newThreadsArray);
                     _threads = newThreads;
                 }
@@ -915,9 +916,7 @@ namespace System.Diagnostics
                 }
             }
 
-            Process[] temp = new Process[list.Count];
-            list.CopyTo(temp, 0);
-            return temp;
+            return list.ToArray();
         }
 
         /// <devdoc>
@@ -1111,24 +1110,6 @@ namespace System.Diagnostics
         private static Encoding GetEncoding(int codePage)
         {
             return EncodingHelper.GetSupportedConsoleEncoding(codePage);
-        }
-
-        public static Process Start(string fileName, string userName, SecureString password, string domain)
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo(fileName);
-            startInfo.UserName = userName;
-            startInfo.Password = password;
-            startInfo.Domain = domain;
-            return Start(startInfo);
-        }
-
-        public static Process Start(string fileName, string arguments, string userName, SecureString password, string domain)
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo(fileName, arguments);
-            startInfo.UserName = userName;
-            startInfo.Password = password;
-            startInfo.Domain = domain;
-            return Start(startInfo);
         }
 
         /// <devdoc>

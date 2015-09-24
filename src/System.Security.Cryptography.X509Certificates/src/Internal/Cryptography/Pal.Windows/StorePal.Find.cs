@@ -23,10 +23,12 @@ namespace Internal.Cryptography.Pal
 {
     internal sealed partial class StorePal : IDisposable, IStorePal
     {
-        public IEnumerable<X509Certificate2> Find(X509FindType findType, Object findValue, bool validOnly)
+        public void FindAndCopyTo(X509FindType findType, object findValue, bool validOnly, X509Certificate2Collection collection)
         {
+            Debug.Assert(collection != null);
+
             StorePal findResults = CreatedLinkedStoreWithFindResults(findType, findValue, validOnly);
-            return findResults.Certificates;
+            findResults.CopyTo(collection);
         }
 
         private StorePal CreatedLinkedStoreWithFindResults(X509FindType findType, Object findValue, bool validOnly)
@@ -476,7 +478,7 @@ namespace Internal.Cryptography.Pal
                 CertStoreFlags.CERT_STORE_ENUM_ARCHIVED_FLAG | CertStoreFlags.CERT_STORE_CREATE_NEW_FLAG,
                 null);
             if (findResults.IsInvalid)
-                throw new CryptographicException(Marshal.GetHRForLastWin32Error());
+                throw Marshal.GetHRForLastWin32Error().ToCryptographicException();;
 
             SafeCertContextHandle pCertContext = null;
             while (Interop.crypt32.CertFindCertificateInStore(_certStore, dwFindType, pvFindPara, ref pCertContext))
@@ -491,7 +493,7 @@ namespace Internal.Cryptography.Pal
                 }
 
                 if (!Interop.crypt32.CertAddCertificateLinkToStore(findResults, pCertContext, CertStoreAddDisposition.CERT_STORE_ADD_ALWAYS, IntPtr.Zero))
-                    throw new CryptographicException(Marshal.GetLastWin32Error());
+                    throw Marshal.GetLastWin32Error().ToCryptographicException();
             }
 
             return new StorePal(findResults);
@@ -532,11 +534,11 @@ namespace Internal.Cryptography.Pal
 
             int cch = Interop.crypt32.CertGetNameString(pCertContext, dwNameType, dwNameFlags, ref stringType, null, 0);
             if (cch == 0)
-                throw new CryptographicException(Marshal.GetLastWin32Error());
+                throw Marshal.GetLastWin32Error().ToCryptographicException();
 
             StringBuilder sb = new StringBuilder(cch);
             if (0 == Interop.crypt32.CertGetNameString(pCertContext, dwNameType, dwNameFlags, ref stringType, sb, cch))
-                throw new CryptographicException(Marshal.GetLastWin32Error());
+                throw Marshal.GetLastWin32Error().ToCryptographicException();
 
             return sb.ToString();
         }

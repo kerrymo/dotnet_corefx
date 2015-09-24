@@ -17,9 +17,12 @@
     <Compile Include="DataContractSerializer.cs" />
     <Compile Include="DataContractSerializerTestData.cs" />
     <Compile Include="MyResolver.cs" />
+    <Compile Include="XmlDictionaryWriterTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(CommonTestPath)\System\Console.cs" />
+    <Compile Include="$(CommonTestPath)\System\Console.cs">
+      <Link>Common\System\Console.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\System.Private.DataContractSerialization\src\System.Private.DataContractSerialization.csproj">

@@ -67,11 +67,6 @@ namespace System.Diagnostics
             }
 
             // Return the set of modules found
-            if (modules.Count == 0)
-            {
-                // Match Windows behavior when failing to enumerate modules
-                throw new Win32Exception(SR.EnumProcessModuleFailed);
-            }
             return modules.ToArray();
         }
 
@@ -101,7 +96,7 @@ namespace System.Diagnostics
                     // arbitrary other processes.
                 };
             }
-            catch (FileNotFoundException)
+            catch (IOException)
             {
                 // Between the time that we get an ID and the time that we try to read the associated stat
                 // file(s), the process could be gone.
@@ -123,7 +118,7 @@ namespace System.Diagnostics
                         pi._threadInfoList.Add(new ThreadInfo
                         {
                             _processId = pid,
-                            _threadId = tid,
+                            _threadId = (ulong)tid,
                             _basePriority = pi.BasePriority,
                             _currentPriority = (int)stat.nice,
                             _startAddress = (IntPtr)stat.startstack,
@@ -133,8 +128,7 @@ namespace System.Diagnostics
                     }
                 }
             }
-            catch (FileNotFoundException) { } // process and/or threads may go away by the time we try to read from them
-            catch (DirectoryNotFoundException) { }
+            catch (IOException) { } // process and/or threads may go away by the time we try to read from them
 
             // Finally return what we've built up
             return pi;

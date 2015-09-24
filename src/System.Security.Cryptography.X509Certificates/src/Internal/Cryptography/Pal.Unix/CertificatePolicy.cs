@@ -1,3 +1,6 @@
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -40,7 +43,7 @@ namespace Internal.Cryptography.Pal
         private readonly CertificatePolicy[] _policies;
         private bool _failAllCertificatePolicies;
 
-        public CertificatePolicyChain(X509Certificate2Collection chain)
+        public CertificatePolicyChain(List<X509Certificate2> chain)
         {
             _policies = new CertificatePolicy[chain.Count];
 
@@ -158,7 +161,7 @@ namespace Internal.Cryptography.Pal
             return true;
         }
 
-        private void ReadPolicies(X509Certificate2Collection chain)
+        private void ReadPolicies(List<X509Certificate2> chain)
         {
             for (int i = 0; i < chain.Count; i++)
             {

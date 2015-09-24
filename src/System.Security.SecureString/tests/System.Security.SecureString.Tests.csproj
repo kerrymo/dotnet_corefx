@@ -17,9 +17,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="SecureStringTests.cs" />
-    <Compile Include="$(CommonPath)\Interop\Unix\Interop.Libraries.cs" />
-    <Compile Include="$(CommonPath)\Interop\Unix\libc\Interop.geteuid.cs" />
-    <Compile Include="$(CommonPath)\Interop\Interop.PlatformDetection.cs" />
+    <Compile Include="$(CommonPath)\Interop\Unix\Interop.Libraries.cs">
+      <Link>Common\Interop\Unix\Interop.Libraries.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonPath)\Interop\Unix\System.Native\Interop.GetEUid.cs">
+      <Link>Common\Interop\Unix\System.Native\Interop.GetEUid.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\System.Security.SecureString.csproj">

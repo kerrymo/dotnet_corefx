@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using Xunit;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     public class IntersectTests
     {
         private const int DuplicateFactor = 4;
 
-        public static IEnumerable<object[]> IntersectUnorderedData(object[] leftCounts, object[] rightCounts)
+        public static IEnumerable<object[]> IntersectUnorderedData(int[] leftCounts, int[] rightCounts)
         {
             foreach (object[] parms in UnorderedSources.BinaryRanges(leftCounts.Cast<int>(), (l, r) => 0 - r / 2, rightCounts.Cast<int>()))
             {
@@ -21,7 +20,7 @@ namespace Test
             }
         }
 
-        public static IEnumerable<object[]> IntersectData(object[] leftCounts, object[] rightCounts)
+        public static IEnumerable<object[]> IntersectData(int[] leftCounts, int[] rightCounts)
         {
             foreach (object[] parms in IntersectUnorderedData(leftCounts, rightCounts))
             {
@@ -30,7 +29,7 @@ namespace Test
             }
         }
 
-        public static IEnumerable<object[]> IntersectSourceMultipleData(object[] counts)
+        public static IEnumerable<object[]> IntersectSourceMultipleData(int[] counts)
         {
             foreach (int leftCount in counts.Cast<int>())
             {
@@ -264,6 +263,17 @@ namespace Test
             Assert.Throws<NotSupportedException>(() => ParallelEnumerable.Range(0, 1).Intersect(Enumerable.Range(0, 1)));
             Assert.Throws<NotSupportedException>(() => ParallelEnumerable.Range(0, 1).Intersect(Enumerable.Range(0, 1), null));
 #pragma warning restore 618
+        }
+
+        [Fact]
+        // Should not get the same setting from both operands.
+        public static void Intersect_NoDuplicateSettings()
+        {
+            CancellationToken t = new CancellationTokenSource().Token;
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithCancellation(t).Intersect(ParallelEnumerable.Range(0, 1).WithCancellation(t)));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithDegreeOfParallelism(1).Intersect(ParallelEnumerable.Range(0, 1).WithDegreeOfParallelism(1)));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithExecutionMode(ParallelExecutionMode.Default).Intersect(ParallelEnumerable.Range(0, 1).WithExecutionMode(ParallelExecutionMode.Default)));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithMergeOptions(ParallelMergeOptions.Default).Intersect(ParallelEnumerable.Range(0, 1).WithMergeOptions(ParallelMergeOptions.Default)));
         }
 
         [Fact]

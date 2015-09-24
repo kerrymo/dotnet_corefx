@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     public class SelectSelectManyTests
     {
@@ -207,7 +205,7 @@ namespace Test
         // SelectMany
         //
 
-        public static IEnumerable<object[]> SelectManyUnorderedData(object[] counts)
+        public static IEnumerable<object[]> SelectManyUnorderedData(int[] counts)
         {
             foreach (object[] results in UnorderedSources.Ranges(counts.Cast<int>()))
             {
@@ -221,7 +219,7 @@ namespace Test
             }
         }
 
-        public static IEnumerable<object[]> SelectManyData(object[] counts)
+        public static IEnumerable<object[]> SelectManyData(int[] counts)
         {
             foreach (object[] results in Sources.Ranges(counts.Cast<int>()))
             {

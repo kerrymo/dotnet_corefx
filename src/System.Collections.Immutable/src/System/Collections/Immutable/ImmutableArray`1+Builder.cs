@@ -269,11 +269,7 @@ namespace System.Collections.Immutable
                 var offset = this.Count;
                 this.Count += items.Length;
 
-                var nodes = _elements;
-                for (int i = 0; i < items.Length; i++)
-                {
-                    nodes[offset + i] = items[i];
-                }
+                Array.Copy(items, 0, _elements, offset, items.Length);
             }
 
             /// <summary>
@@ -287,11 +283,7 @@ namespace System.Collections.Immutable
                 var offset = this.Count;
                 this.Count += items.Length;
 
-                var nodes = _elements;
-                for (int i = 0; i < items.Length; i++)
-                {
-                    nodes[offset + i] = items[i];
-                }
+                Array.Copy(items, 0, _elements, offset, items.Length);
             }
 
             /// <summary>
@@ -302,16 +294,12 @@ namespace System.Collections.Immutable
             public void AddRange(T[] items, int length)
             {
                 Requires.NotNull(items, "items");
-                Requires.Range(length >= 0, "length");
+                Requires.Range(length >= 0 && length <= items.Length, "length");
 
                 var offset = this.Count;
                 this.Count += length;
 
-                var nodes = _elements;
-                for (int i = 0; i < length; i++)
-                {
-                    nodes[offset + i] = items[i];
-                }
+                Array.Copy(items, 0, _elements, offset, length);
             }
 
             /// <summary>
@@ -420,14 +408,9 @@ namespace System.Collections.Immutable
             /// </summary>
             public T[] ToArray()
             {
-                var tmp = new T[this.Count];
-                var elements = _elements;
-                for (int i = 0; i < tmp.Length; i++)
-                {
-                    tmp[i] = elements[i];
-                }
-
-                return tmp;
+                T[] result = new T[this.Count];
+                Array.Copy(_elements, 0, result, 0, this.Count);
+                return result;
             }
 
             /// <summary>
@@ -624,7 +607,21 @@ namespace System.Collections.Immutable
             /// </summary>
             public void Reverse()
             {
-                Array.Reverse(_elements, 0, _count);
+                // The non-generic Array.Reverse is not used because it does not perform
+                // well for non-primitive value types.
+                // If/when a generic Array.Reverse<T> becomes available, the below code
+                // can be deleted and replaced with a call to Array.Reverse<T>.
+                int i = 0;
+                int j = _count - 1;
+                T[] array = _elements;
+                while (i < j)
+                {
+                    T temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                    i++;
+                    j--;
+                }
             }
 
             /// <summary>

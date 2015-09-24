@@ -1,22 +1,15 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.IO;
-using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
-using System.Security;
-using System.Security.Permissions;
-using System.Runtime.Versioning;
-using System.Runtime.ConstrainedExecution;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace System.Threading
 {
-    [ComVisibleAttribute(false)]
     public sealed partial class Semaphore : WaitHandle
     {
-        private const int MAX_PATH = 260;
-
         // creates a nameless semaphore object
         // Win32 only takes maximum count of Int32.MaxValue
         [SecuritySafeCritical]
@@ -40,10 +33,7 @@ namespace System.Threading
                 throw new ArgumentException(SR.Argument_SemaphoreInitialMaximum);
             }
 
-            if (null != name && MAX_PATH < name.Length)
-            {
-                throw new ArgumentException(SR.Argument_WaitHandleNameTooLong);
-            }
+            ValidateNewName(name);
 
             SafeWaitHandle myHandle = CreateSemaphone(initialCount, maximumCount, name);
 
@@ -77,10 +67,8 @@ namespace System.Threading
                 throw new ArgumentException(SR.Argument_SemaphoreInitialMaximum);
             }
 
-            if (null != name && MAX_PATH < name.Length)
-            {
-                throw new ArgumentException(SR.Argument_WaitHandleNameTooLong);
-            }
+            ValidateNewName(name);
+
             SafeWaitHandle myHandle;
 
             myHandle = CreateSemaphone(initialCount, maximumCount, name);
@@ -138,19 +126,8 @@ namespace System.Threading
         [SecurityCritical]
         private static OpenExistingResult OpenExistingWorker(string name, out Semaphore result)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-            if (name.Length == 0)
-            {
-                throw new ArgumentException(SR.Format(SR.InvalidNullEmptyArgument, "name"));
-            }
-            if (null != name && MAX_PATH < name.Length)
-            {
-                throw new ArgumentException(SR.Argument_WaitHandleNameTooLong);
-            }
-
+            ValidateExistingName(name);
+            
             result = null;
 
             SafeWaitHandle myHandle = OpenSemaphore(name);

@@ -10,8 +10,8 @@
 
   <!-- Build Tools Versions -->
   <PropertyGroup>
-    <BuildToolsVersion>1.0.25-prerelease-00056</BuildToolsVersion>
-    <DnxVersion>1.0.0-beta5-12101</DnxVersion>
+    <BuildToolsVersion>1.0.25-prerelease-00094</BuildToolsVersion>
+    <DnxVersion>1.0.0-beta7</DnxVersion>
     <DnxPackageName Condition="'$(DnxPackageName)' == '' and '$(OsEnvironment)'!='Unix'">dnx-coreclr-win-x86.$(DnxVersion)</DnxPackageName>
     <DnxPackageName Condition="'$(DnxPackageName)' == '' and '$(OsEnvironment)'=='Unix'">dnx-mono.$(DnxVersion)</DnxPackageName>
     <RoslynVersion>1.0.0-rc3-20150510-01</RoslynVersion>
@@ -198,6 +198,11 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <!-- Temporary until build/CI system is upgraded to C# 6: disable C# 6 features -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj' OR '$(Language)' == 'C#'">
+    <LangVersion>5</LangVersion>
+  </PropertyGroup>
+
   <!-- Set up some common paths -->
   <PropertyGroup>
     <CommonPath>$(SourceDir)Common\src</CommonPath>
@@ -228,6 +233,20 @@
     <TargetsFreeBSD Condition="'$(OSGroup)' == 'FreeBSD'">true</TargetsFreeBSD>
 
     <TargetsUnix Condition="'$(TargetsLinux)' == 'true' or '$(TargetsOSX)' == 'true' or '$(TargetsFreeBSD)' == 'true'">true</TargetsUnix>
+  </PropertyGroup>
+  <!-- Make some assumptions based on TargetsPlatform -->
+  <PropertyGroup Condition="'$(UseUnixPackageTargetRuntimeDefaults)' == 'true' OR '$(UsePackageTargetRuntimeDefaults)' == 'true'">
+    <PackageTargetRuntime Condition=" '$(TargetsLinux)' == 'true'  AND '$(PackageTargetRuntime)' == ''">linux</PackageTargetRuntime>
+    <PackageTargetRuntime Condition=" '$(TargetsOSX)' == 'true'  AND '$(PackageTargetRuntime)' == ''">osx</PackageTargetRuntime>
+    <PackageTargetRuntime Condition=" '$(TargetsUnix)' == 'true' AND '$(PackageTargetRuntime)' == ''">unix</PackageTargetRuntime>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(UseWindowsPackageTargetRuntimeDefault)' == 'true' OR '$(UsePackageTargetRuntimeDefaults)' == 'true'">
+    <PackageTargetRuntime Condition=" '$(TargetsWindows)' == 'true' AND '$(PackageTargetRuntime)' == ''">win7</PackageTargetRuntime>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Don't run tests if we're building another platform's binaries on Windows -->
+    <SkipTests Condition="'$(SkipTests)'=='' and ('$(OsEnvironment)'=='Windows_NT' and '$(TargetsWindows)'!='true')">true</SkipTests>
   </PropertyGroup>
 
   <PropertyGroup>

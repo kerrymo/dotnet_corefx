@@ -1,12 +1,11 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using Xunit;
 
-namespace Test
+namespace System.Linq.Parallel.Tests
 {
     public class ZipTests
     {
@@ -15,7 +14,7 @@ namespace Test
         //
 
         // Get two ranges, where the right starts at the end of the left range.
-        public static IEnumerable<object[]> ZipUnorderedData(object[] counts)
+        public static IEnumerable<object[]> ZipUnorderedData(int[] counts)
         {
             foreach (object[] parms in UnorderedSources.BinaryRanges(counts.Cast<int>(), (left, right) => left, counts.Cast<int>()))
             {
@@ -25,7 +24,7 @@ namespace Test
 
         // Get two ranges, where the right starts and the end of the left range.
         // Either or both range will be ordered.
-        public static IEnumerable<object[]> ZipData(object[] counts)
+        public static IEnumerable<object[]> ZipData(int[] counts)
         {
             foreach (object[] parms in ZipUnorderedData(counts))
             {
@@ -36,7 +35,7 @@ namespace Test
         }
 
         // Get two ranges, both from 0 to each count, and having an extra parameter denoting the degree or parallelism to use.
-        public static IEnumerable<object[]> ZipThreadedData(object[] counts, object[] degrees)
+        public static IEnumerable<object[]> ZipThreadedData(int[] counts, int[] degrees)
         {
             foreach (object[] left in Sources.Ranges(counts))
             {
@@ -164,6 +163,17 @@ namespace Test
 #pragma warning disable 618
             Assert.Throws<NotSupportedException>(() => ParallelEnumerable.Range(0, 1).Zip(Enumerable.Range(0, 1), (x, y) => x));
 #pragma warning restore 618
+        }
+
+        [Fact]
+        // Should not get the same setting from both operands.
+        public static void Zip_NoDuplicateSettings()
+        {
+            CancellationToken t = new CancellationTokenSource().Token;
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithCancellation(t).Zip(ParallelEnumerable.Range(0, 1).WithCancellation(t), (l, r) => l));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithDegreeOfParallelism(1).Zip(ParallelEnumerable.Range(0, 1).WithDegreeOfParallelism(1), (l, r) => l));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithExecutionMode(ParallelExecutionMode.Default).Zip(ParallelEnumerable.Range(0, 1).WithExecutionMode(ParallelExecutionMode.Default), (l, r) => l));
+            Assert.Throws<InvalidOperationException>(() => ParallelEnumerable.Range(0, 1).WithMergeOptions(ParallelMergeOptions.Default).Zip(ParallelEnumerable.Range(0, 1).WithMergeOptions(ParallelMergeOptions.Default), (l, r) => l));
         }
 
         [Fact]
