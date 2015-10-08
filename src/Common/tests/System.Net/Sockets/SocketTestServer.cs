@@ -7,14 +7,24 @@ namespace System.Net.Sockets.Tests
     // SocketTestServer.DefaultFactoryConfiguration.cs
     public abstract partial class SocketTestServer : IDisposable
     {
+        private const int DefaultNumConnections = 5;
+        private const int DefaultReceiveBufferSize = 1024;
+
+        protected abstract int Port { get; }
+
         public static SocketTestServer SocketTestServerFactory(EndPoint endpoint)
         {
-            return SocketTestServerFactory(5, 1024, endpoint);
+            return SocketTestServerFactory(DefaultNumConnections, DefaultReceiveBufferSize, endpoint);
+        }
+
+        public static SocketTestServer SocketTestServerFactory(IPAddress address, out int port)
+        {
+            return SocketTestServerFactory(DefaultNumConnections, DefaultReceiveBufferSize, address, out port);
         }
 
         public static SocketTestServer SocketTestServerFactory(
-            int numConnections, 
-            int receiveBufferSize, 
+            int numConnections,
+            int receiveBufferSize,
             EndPoint localEndPoint)
         {
             return SocketTestServerFactory(
@@ -25,9 +35,23 @@ namespace System.Net.Sockets.Tests
         }
 
         public static SocketTestServer SocketTestServerFactory(
-            SocketImplementationType type, 
-            int numConnections, 
-            int receiveBufferSize, 
+            int numConnections,
+            int receiveBufferSize,
+            IPAddress address,
+            out int port)
+        {
+            return SocketTestServerFactory(
+                s_implementationType,
+                numConnections,
+                receiveBufferSize,
+                address,
+                out port);
+        }
+
+        public static SocketTestServer SocketTestServerFactory(
+            SocketImplementationType type,
+            int numConnections,
+            int receiveBufferSize,
             EndPoint localEndPoint)
         {
             switch (type)
@@ -39,6 +63,18 @@ namespace System.Net.Sockets.Tests
                 default:
                     throw new ArgumentOutOfRangeException("type");
             }
+        }
+
+        public static SocketTestServer SocketTestServerFactory(
+            SocketImplementationType type,
+            int numConnections,
+            int receiveBufferSize,
+            IPAddress address,
+            out int port)
+        {
+            SocketTestServer server = SocketTestServerFactory(type, numConnections, receiveBufferSize, new IPEndPoint(address, 0));
+            port = server.Port;
+            return server;
         }
 
         public void Dispose()
