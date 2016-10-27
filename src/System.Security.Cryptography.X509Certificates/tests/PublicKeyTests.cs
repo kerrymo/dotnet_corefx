@@ -70,6 +70,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             PublicKey pk = GetTestRsaKey();
             AsymmetricAlgorithm alg = pk.Key;
             Assert.NotNull(alg);
+
             Assert.Same(alg, pk.Key);
             Assert.Equal(2048, alg.KeySize);
 

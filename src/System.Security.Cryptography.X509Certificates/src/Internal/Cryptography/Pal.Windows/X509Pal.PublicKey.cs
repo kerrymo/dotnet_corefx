@@ -32,6 +32,11 @@ namespace Internal.Cryptography.Pal
                 return DecodeECDsaPublicKey((CertificatePal)certificatePal);
             }
 
+            return DecodePublicKey(oid, encodedKeyValue, encodedParameters);
+        }
+
+        public AsymmetricAlgorithm DecodePublicKey(Oid oid, byte[] encodedKeyValue, byte[] encodedParameters)
+        {
             int algId = Interop.Crypt32.FindOidInfo(CryptOidInfoKeyType.CRYPT_OID_INFO_OID_KEY, oid.Value, OidGroup.PublicKeyAlgorithm, fallBackToAllGroups: true).AlgId;
             switch (algId)
             {

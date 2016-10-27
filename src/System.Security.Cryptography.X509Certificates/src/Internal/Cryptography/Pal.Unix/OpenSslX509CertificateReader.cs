@@ -264,7 +264,6 @@ namespace Internal.Cryptography.Pal
                 case Oids.DsaDsa:
                     return GetDSAPrivateKey();
                 case Oids.Ecc:
-                    return GetECDsaPrivateKey();
             }
 
             throw new NotSupportedException(SR.NotSupported_KeyAlgorithm);

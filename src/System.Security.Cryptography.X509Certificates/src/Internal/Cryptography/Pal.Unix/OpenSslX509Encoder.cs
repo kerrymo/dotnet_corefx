@@ -30,6 +30,18 @@ namespace Internal.Cryptography.Pal
             throw new NotSupportedException(SR.NotSupported_KeyAlgorithm);
         }
 
+        public AsymmetricAlgorithm DecodePublicKey(Oid oid, byte[] encodedKeyValue, byte[] encodedParameters)
+        {
+            switch (oid.Value)
+            {
+                case Oids.RsaRsa:
+                    return BuildRsaPublicKey(encodedKeyValue);
+            }
+
+            // NotSupportedException is what desktop and CoreFx-Windows throw in this situation.
+            throw new NotSupportedException(SR.NotSupported_KeyAlgorithm);
+        }
+
         public string X500DistinguishedNameDecode(byte[] encodedDistinguishedName, X500DistinguishedNameFlags flags)
         {
             return X500NameEncoder.X500DistinguishedNameDecode(encodedDistinguishedName, true, flags);
