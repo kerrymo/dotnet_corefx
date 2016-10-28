@@ -37,7 +37,7 @@ internal static partial class Interop
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool Pkcs12Parse(
             SafePkcs12Handle p12,
-            string pass,
+            IntPtr pass,
             out SafeEvpPKeyHandle pkey,
             out SafeX509Handle cert,
             out SafeX509StackHandle ca);

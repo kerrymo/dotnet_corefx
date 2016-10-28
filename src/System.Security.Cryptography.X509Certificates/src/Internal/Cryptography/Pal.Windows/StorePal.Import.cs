@@ -13,87 +13,97 @@ namespace Internal.Cryptography.Pal
 {
     internal sealed partial class StorePal : IDisposable, IStorePal, IExportPal, ILoaderPal
     {
-        public static ILoaderPal FromBlob(byte[] rawData, string password, X509KeyStorageFlags keyStorageFlags)
+        public static ILoaderPal FromBlob(byte[] rawData, object password, X509KeyStorageFlags keyStorageFlags)
         {
             return FromBlobOrFile(rawData, null, password, keyStorageFlags);
         }
 
-        public static ILoaderPal FromFile(string fileName, string password, X509KeyStorageFlags keyStorageFlags)
+        public static ILoaderPal FromFile(string fileName, object password, X509KeyStorageFlags keyStorageFlags)
         {
             return FromBlobOrFile(null, fileName, password, keyStorageFlags);
         }
 
-        private static StorePal FromBlobOrFile(byte[] rawData, string fileName, string password, X509KeyStorageFlags keyStorageFlags)
+        private static StorePal FromBlobOrFile(byte[] rawData, string fileName, object password, X509KeyStorageFlags keyStorageFlags)
         {
             bool fromFile = fileName != null;
+            IntPtr szPassword = IntPtr.Zero;
 
-            unsafe
+            try
             {
-                fixed (byte* pRawData = rawData)
+                szPassword = SecureStringHelpers.PasswordToGlobalAllocUnicode(password);
+                unsafe
                 {
-                    fixed (char* pFileName = fileName)
+                    fixed (byte* pRawData = rawData)
                     {
-                        CRYPTOAPI_BLOB blob = new CRYPTOAPI_BLOB(fromFile ? 0 : rawData.Length, pRawData);
-                        bool persistKeySet = (0 != (keyStorageFlags & X509KeyStorageFlags.PersistKeySet));
-                        PfxCertStoreFlags certStoreFlags = MapKeyStorageFlags(keyStorageFlags);
-
-                        void* pvObject = fromFile ? (void*)pFileName : (void*)&blob;
-
-                        ContentType contentType;
-                        SafeCertStoreHandle certStore;
-                        if (!Interop.crypt32.CryptQueryObject(
-                            fromFile ? CertQueryObjectType.CERT_QUERY_OBJECT_FILE : CertQueryObjectType.CERT_QUERY_OBJECT_BLOB,
-                            pvObject,
-                            StoreExpectedContentFlags,
-                            ExpectedFormatTypeFlags.CERT_QUERY_FORMAT_FLAG_ALL,
-                            0,
-                            IntPtr.Zero,
-                            out contentType,
-                            IntPtr.Zero,
-                            out certStore,
-                            IntPtr.Zero,
-                            IntPtr.Zero
-                            ))
+                        fixed (char* pFileName = fileName)
                         {
-                            throw Marshal.GetLastWin32Error().ToCryptographicException();
-                        }
+                            CRYPTOAPI_BLOB blob = new CRYPTOAPI_BLOB(fromFile ? 0 : rawData.Length, pRawData);
+                            bool persistKeySet = (0 != (keyStorageFlags & X509KeyStorageFlags.PersistKeySet));
+                            PfxCertStoreFlags certStoreFlags = MapKeyStorageFlags(keyStorageFlags);
 
-                        if (contentType == ContentType.CERT_QUERY_CONTENT_PFX)
-                        {
-                            certStore.Dispose();
+                            void* pvObject = fromFile ? (void*)pFileName : (void*)&blob;
 
-                            if (fromFile)
+                            ContentType contentType;
+                            SafeCertStoreHandle certStore;
+                            if (!Interop.crypt32.CryptQueryObject(
+                                fromFile ? CertQueryObjectType.CERT_QUERY_OBJECT_FILE : CertQueryObjectType.CERT_QUERY_OBJECT_BLOB,
+                                pvObject,
+                                StoreExpectedContentFlags,
+                                ExpectedFormatTypeFlags.CERT_QUERY_FORMAT_FLAG_ALL,
+                                0,
+                                IntPtr.Zero,
+                                out contentType,
+                                IntPtr.Zero,
+                                out certStore,
+                                IntPtr.Zero,
+                                IntPtr.Zero
+                                ))
                             {
-                                rawData = File.ReadAllBytes(fileName);
-                            }
-                            fixed (byte* pRawData2 = rawData)
-                            {
-                                CRYPTOAPI_BLOB blob2 = new CRYPTOAPI_BLOB(rawData.Length, pRawData2);
-                                certStore = Interop.crypt32.PFXImportCertStore(ref blob2, password, certStoreFlags);
-                                if (certStore == null || certStore.IsInvalid)
-                                    throw Marshal.GetLastWin32Error().ToCryptographicException();
+                                throw Marshal.GetLastWin32Error().ToCryptographicException();
                             }
 
-                            if (!persistKeySet)
+                            if (contentType == ContentType.CERT_QUERY_CONTENT_PFX)
                             {
-                                //
-                                // If the user did not want us to persist private keys, then we should loop through all
-                                // the certificates in the collection and set our custom CERT_DELETE_KEYSET_PROP_ID property
-                                // so the key container will be deleted when the cert contexts will go away.
-                                //
-                                SafeCertContextHandle pCertContext = null;
-                                while (Interop.crypt32.CertEnumCertificatesInStore(certStore, ref pCertContext))
+                                certStore.Dispose();
+
+                                if (fromFile)
                                 {
-                                    CRYPTOAPI_BLOB nullBlob = new CRYPTOAPI_BLOB(0, null);
-                                    if (!Interop.crypt32.CertSetCertificateContextProperty(pCertContext, CertContextPropId.CERT_DELETE_KEYSET_PROP_ID, CertSetPropertyFlags.CERT_SET_PROPERTY_INHIBIT_PERSIST_FLAG, &nullBlob))
+                                    rawData = File.ReadAllBytes(fileName);
+                                }
+                                fixed (byte* pRawData2 = rawData)
+                                {
+                                    CRYPTOAPI_BLOB blob2 = new CRYPTOAPI_BLOB(rawData.Length, pRawData2);
+                                    certStore = Interop.crypt32.PFXImportCertStore(ref blob2, szPassword, certStoreFlags);
+                                    if (certStore == null || certStore.IsInvalid)
                                         throw Marshal.GetLastWin32Error().ToCryptographicException();
                                 }
-                            }
-                        }
 
-                        return new StorePal(certStore);
+                                if (!persistKeySet)
+                                {
+                                    //
+                                    // If the user did not want us to persist private keys, then we should loop through all
+                                    // the certificates in the collection and set our custom CERT_DELETE_KEYSET_PROP_ID property
+                                    // so the key container will be deleted when the cert contexts will go away.
+                                    //
+                                    SafeCertContextHandle pCertContext = null;
+                                    while (Interop.crypt32.CertEnumCertificatesInStore(certStore, ref pCertContext))
+                                    {
+                                        CRYPTOAPI_BLOB nullBlob = new CRYPTOAPI_BLOB(0, null);
+                                        if (!Interop.crypt32.CertSetCertificateContextProperty(pCertContext, CertContextPropId.CERT_DELETE_KEYSET_PROP_ID, CertSetPropertyFlags.CERT_SET_PROPERTY_INHIBIT_PERSIST_FLAG, &nullBlob))
+                                            throw Marshal.GetLastWin32Error().ToCryptographicException();
+                                    }
+                                }
+                            }
+
+                            return new StorePal(certStore);
+                        }
                     }
                 }
+            }
+            finally
+            {
+                if (szPassword != IntPtr.Zero)
+                    Marshal.ZeroFreeGlobalAllocUnicode(szPassword);
             }
         }
 

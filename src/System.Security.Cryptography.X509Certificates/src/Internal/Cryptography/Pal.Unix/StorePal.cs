@@ -18,7 +18,7 @@ namespace Internal.Cryptography.Pal
         private static CollectionBackedStoreProvider s_machineIntermediateStore;
         private static readonly object s_machineLoadLock = new object();
 
-        public static ILoaderPal FromBlob(byte[] rawData, string password, X509KeyStorageFlags keyStorageFlags)
+        public static ILoaderPal FromBlob(byte[] rawData, object password, X509KeyStorageFlags keyStorageFlags)
         {
             ICertificatePal singleCert;
 

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Microsoft.Win32.SafeHandles;
+using System.Runtime.InteropServices;
 
 namespace Internal.Cryptography.Pal
 {
@@ -77,18 +78,28 @@ namespace Internal.Cryptography.Pal
             }
         }
 
-        public void Decrypt(string password)
+        public void Decrypt(object password)
         {
-            bool parsed = Interop.Crypto.Pkcs12Parse(
-                _pkcs12Handle,
-                password,
-                out _evpPkeyHandle,
-                out _x509Handle,
-                out _caStackHandle);
-
-            if (!parsed)
+            IntPtr szPassword = IntPtr.Zero;
+            try
             {
-                throw Interop.Crypto.CreateOpenSslCryptographicException();
+                szPassword = SecureStringHelpers.PasswordToGlobalAllocUnicode(password);
+                bool parsed = Interop.Crypto.Pkcs12Parse(
+                    _pkcs12Handle,
+                    szPassword,
+                    out _evpPkeyHandle,
+                    out _x509Handle,
+                    out _caStackHandle);
+
+                if (!parsed)
+                {
+                    throw Interop.Crypto.CreateOpenSslCryptographicException();
+                }
+            }
+            finally
+            {
+                if (szPassword != IntPtr.Zero)
+                    Marshal.ZeroFreeGlobalAllocUnicode(szPassword);
             }
         }
 

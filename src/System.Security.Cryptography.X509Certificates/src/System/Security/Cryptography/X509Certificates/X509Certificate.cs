@@ -7,6 +7,7 @@ using Internal.Cryptography.Pal;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.Serialization;
+using System.Security;
 using System.Text;
 
 namespace System.Security.Cryptography.X509Certificates
@@ -29,11 +30,26 @@ namespace System.Security.Cryptography.X509Certificates
         {
         }
 
+        public X509Certificate(byte[] rawData, SecureString password)
+            : this(rawData, password, X509KeyStorageFlags.DefaultKeySet)
+        {
+        }
+
         public X509Certificate(byte[] rawData, string password, X509KeyStorageFlags keyStorageFlags)
         {
             if (rawData == null || rawData.Length == 0)
                 throw new ArgumentException(SR.Arg_EmptyOrNullArray, nameof(rawData));
  
+            ValidateKeyStorageFlags(keyStorageFlags);
+
+            Pal = CertificatePal.FromBlob(rawData, password, keyStorageFlags);
+        }
+
+        public X509Certificate(byte[] rawData, SecureString password, X509KeyStorageFlags keyStorageFlags)
+        {
+            if (rawData == null || rawData.Length == 0)
+                throw new ArgumentException(SR.Arg_EmptyOrNullArray, nameof(rawData));
+
             ValidateKeyStorageFlags(keyStorageFlags);
 
             Pal = CertificatePal.FromBlob(rawData, password, keyStorageFlags);
@@ -51,11 +67,16 @@ namespace System.Security.Cryptography.X509Certificates
         }
 
         public X509Certificate(string fileName)
-            : this(fileName, null, X509KeyStorageFlags.DefaultKeySet)
+            : this(fileName, (string)null, X509KeyStorageFlags.DefaultKeySet)
         {
         }
 
         public X509Certificate(string fileName, string password)
+            : this(fileName, password, X509KeyStorageFlags.DefaultKeySet)
+        {
+        }
+
+        public X509Certificate(string fileName, SecureString password)
             : this(fileName, password, X509KeyStorageFlags.DefaultKeySet)
         {
         }
@@ -65,6 +86,16 @@ namespace System.Security.Cryptography.X509Certificates
             if (fileName == null)
                 throw new ArgumentNullException(nameof(fileName));
             
+            ValidateKeyStorageFlags(keyStorageFlags);
+
+            Pal = CertificatePal.FromFile(fileName, password, keyStorageFlags);
+        }
+
+        public X509Certificate(string fileName, SecureString password, X509KeyStorageFlags keyStorageFlags) : this()
+        {
+            if (fileName == null)
+                throw new ArgumentNullException(nameof(fileName));
+
             ValidateKeyStorageFlags(keyStorageFlags);
 
             Pal = CertificatePal.FromFile(fileName, password, keyStorageFlags);

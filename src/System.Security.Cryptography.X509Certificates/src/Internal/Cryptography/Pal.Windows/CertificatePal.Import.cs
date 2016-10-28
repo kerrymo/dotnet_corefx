@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
 using Internal.Cryptography.Pal.Native;
@@ -14,17 +15,17 @@ namespace Internal.Cryptography.Pal
 {
     internal sealed partial class CertificatePal : IDisposable, ICertificatePal
     {
-        public static ICertificatePal FromBlob(byte[] rawData, string password, X509KeyStorageFlags keyStorageFlags)
+        public static ICertificatePal FromBlob(byte[] rawData, object password, X509KeyStorageFlags keyStorageFlags)
         {
             return FromBlobOrFile(rawData, null, password, keyStorageFlags);
         }
 
-        public static ICertificatePal FromFile(string fileName, string password, X509KeyStorageFlags keyStorageFlags)
+        public static ICertificatePal FromFile(string fileName, object password, X509KeyStorageFlags keyStorageFlags)
         {
             return FromBlobOrFile(null, fileName, password, keyStorageFlags);
         }
 
-        private static ICertificatePal FromBlobOrFile(byte[] rawData, string fileName, string password, X509KeyStorageFlags keyStorageFlags)
+        private static ICertificatePal FromBlobOrFile(byte[] rawData, string fileName, object password, X509KeyStorageFlags keyStorageFlags)
         {
             Debug.Assert(rawData != null || fileName != null);
 
@@ -39,9 +40,11 @@ namespace Internal.Cryptography.Pal
             SafeCertStoreHandle hCertStore = null;
             SafeCryptMsgHandle hCryptMsg = null;
             SafeCertContextHandle pCertContext = null;
+            IntPtr szPassword = IntPtr.Zero;
 
             try
             {
+                szPassword = SecureStringHelpers.PasswordToGlobalAllocUnicode(password);
                 unsafe
                 {
                     fixed (byte* pRawData = rawData)
@@ -82,7 +85,7 @@ namespace Internal.Cryptography.Pal
                     {
                         if (loadFromFile)
                             rawData = File.ReadAllBytes(fileName);
-                        pCertContext = FilterPFXStore(rawData, password, pfxCertStoreFlags);
+                        pCertContext = FilterPFXStore(rawData, szPassword, pfxCertStoreFlags);
                     }
 
                     CertificatePal pal = new CertificatePal(pCertContext, deleteKeyContainer: !persistKeySet);
@@ -98,6 +101,8 @@ namespace Internal.Cryptography.Pal
                     hCryptMsg.Dispose();
                 if (pCertContext != null)
                     pCertContext.Dispose();
+                if (szPassword != IntPtr.Zero)
+                    Marshal.ZeroFreeGlobalAllocUnicode(szPassword);
             }
         }
 
@@ -140,7 +145,7 @@ namespace Internal.Cryptography.Pal
             }
         }
 
-        private static SafeCertContextHandle FilterPFXStore(byte[] rawData, string password, PfxCertStoreFlags pfxCertStoreFlags)
+        private static SafeCertContextHandle FilterPFXStore(byte[] rawData, IntPtr password, PfxCertStoreFlags pfxCertStoreFlags)
         {
             SafeCertStoreHandle hStore;
             unsafe
@@ -150,7 +155,7 @@ namespace Internal.Cryptography.Pal
                     CRYPTOAPI_BLOB certBlob = new CRYPTOAPI_BLOB(rawData.Length, pbRawData);
                     hStore = Interop.crypt32.PFXImportCertStore(ref certBlob, password, pfxCertStoreFlags);
                     if (hStore.IsInvalid)
-                        throw Marshal.GetHRForLastWin32Error().ToCryptographicException();;
+                        throw Marshal.GetHRForLastWin32Error().ToCryptographicException();
                 }
             }
 

@@ -84,6 +84,16 @@ Og7vtpU6pzjkJZIIpohmgg==
 
         public const string PfxDataPassword = "12345";
 
+        public static SecureString GetPfxDataPasswordSecureString()
+        {
+            var s = new SecureString();
+            foreach (char c in PfxDataPassword.ToCharArray())
+            {
+                s.AppendChar(c);
+            }
+            return s;
+        }
+
         public static readonly byte[] PfxSha1Empty_ExpectedSig = (
             "44b15120b8c7de19b4968d761600ffb8c54e5d0c1bcaba0880a20ab48912c8fd" + 
             "fa81b28134eabf58f3211a0d1eefdaae115e7872d5a67045c3b62a5da4393940" +

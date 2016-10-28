@@ -29,7 +29,7 @@ namespace Internal.Cryptography.Pal
             return certPal.DuplicateHandles();
         }
 
-        public static ICertificatePal FromBlob(byte[] rawData, string password, X509KeyStorageFlags keyStorageFlags)
+        public static ICertificatePal FromBlob(byte[] rawData, object password, X509KeyStorageFlags keyStorageFlags)
         {
             ICertificatePal cert;
 
@@ -52,7 +52,7 @@ namespace Internal.Cryptography.Pal
             throw Interop.Crypto.CreateOpenSslCryptographicException();
         }
 
-        public static ICertificatePal FromFile(string fileName, string password, X509KeyStorageFlags keyStorageFlags)
+        public static ICertificatePal FromFile(string fileName, object password, X509KeyStorageFlags keyStorageFlags)
         {
             // If we can't open the file, fail right away.
             using (SafeBioHandle fileBio = Interop.Crypto.BioNewFile(fileName, "rb"))
@@ -63,7 +63,7 @@ namespace Internal.Cryptography.Pal
             }
         }
 
-        private static ICertificatePal FromBio(SafeBioHandle bio, string password)
+        private static ICertificatePal FromBio(SafeBioHandle bio, object password)
         {
             int bioPosition = Interop.Crypto.BioTell(bio);
 
