@@ -320,7 +320,10 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             // binary is always used by default, meaning it doesn't know EphemeralKeySet doesn't exist.
         }
 
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
         [Fact]
         public static void InvalidStorageFlags_PersistedEphemeral()
         {
@@ -338,17 +341,18 @@ namespace System.Security.Cryptography.X509Certificates.Tests
                 "keyStorageFlags",
                 () => coll.Import(string.Empty, string.Empty, PersistedEphemeral));
         }
-#endif
 
         public static IEnumerable<object[]> StorageFlags
         {
             get
             {
                 yield return new object[] { X509KeyStorageFlags.DefaultKeySet };
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
                 yield return new object[] { X509KeyStorageFlags.EphemeralKeySet };
-#endif
             }
         }
 

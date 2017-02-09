@@ -10,6 +10,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard-Windows_NT-Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard-Windows_NT-Release|AnyCPU'" />
   <ItemGroup>
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
     <Compile Include="CspParametersTests.cs" />
     <Compile Include="ImportExportCspBlob.cs" />
     <Compile Include="RSACryptoServiceProviderBackCompat.cs" />
@@ -44,19 +45,35 @@
     </Compile>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)'=='netcoreapp'">
+=======
+>>>>>>> Update crypto tests for build changes
     <Compile Include="AesCryptoServiceProviderTests.cs" />
+    <Compile Include="CspParametersTests.cs" />
     <Compile Include="DESCryptoServiceProviderProvider.cs" />
     <Compile Include="DSACryptoServiceProviderProvider.cs" />
     <Compile Include="DSACryptoServiceProviderTests.cs" />
+    <Compile Include="ImportExportCspBlob.cs" />
     <Compile Include="MD5CryptoServiceProviderTests.cs" />
     <Compile Include="PasswordDeriveBytesTests.cs" />
     <Compile Include="RC2CryptoServiceProviderProvider.cs" />
     <Compile Include="RC2CryptoServiceProviderTests.cs" />
     <Compile Include="RNGCryptoServiceProviderTests.cs" />
+    <Compile Include="RSACryptoServiceProviderBackCompat.cs" />
+    <Compile Include="RSACryptoServiceProviderProvider.cs" />
+    <Compile Include="RSACryptoServiceProviderTests.cs" />
     <Compile Include="SHA1CryptoServiceProviderTests.cs" />
     <Compile Include="TripleDESCryptoServiceProviderTests.cs" />
+    <Compile Include="$(CommonTestPath)\System\IO\PositionValueStream.cs">
+      <Link>CommonTest\System\IO\PositionValueStream.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AsymmetricSignatureFormatter.cs">
       <Link>CommonTest\System\Security\Cryptography\AsymmetricSignatureFormatter.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\ByteUtils.cs">
+      <Link>CommonTest\System\Security\Cryptography\ByteUtils.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\CryptoUtils.cs">
+      <Link>CommonTest\System\Security\Cryptography\CryptoUtils.cs</Link>
     </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DES\DESCipherTests.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DES\DESCipherTests.cs</Link>
@@ -100,11 +117,29 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAKeyExchangeFormatter.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAKeyExchangeFormatter.cs</Link>
     </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\EncryptDecrypt.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\EncryptDecrypt.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\ImportExport.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\ImportExport.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\KeyGeneration.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\KeyGeneration.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAFactory.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAFactory.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSASignatureFormatter.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSASignatureFormatter.cs</Link>
     </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\SignVerify.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\SignVerify.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\TestData.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\TestData.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.targets))\dir.targets" />

@@ -12,11 +12,12 @@ namespace System.Security.Cryptography.X509Certificates.Tests
     internal static class Cert
     {
         internal const X509KeyStorageFlags EphemeralIfPossible =
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
             X509KeyStorageFlags.EphemeralKeySet;
-#else
-            X509KeyStorageFlags.DefaultKeySet;
-#endif
+
         //
         // The Import() methods have an overload for each X509Certificate2Collection.Import() overload.
         //

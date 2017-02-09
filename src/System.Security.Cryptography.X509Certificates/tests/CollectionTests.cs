@@ -654,13 +654,15 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             TestExportSingleCert(X509ContentType.Cert);
         }
 
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
         [Fact]
         public static void ExportCert_SecureString()
         {
             TestExportSingleCert_SecureStringPassword(X509ContentType.Cert);
         }
-#endif
 
         [Fact]
         [PlatformSpecific(TestPlatforms.Windows)]  // SerializedCert not supported on Unix
@@ -1401,7 +1403,10 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
         private static void TestExportSingleCert_SecureStringPassword(X509ContentType ct)
         {
             using (var pfxCer = new X509Certificate2(TestData.PfxData, TestData.CreatePfxDataPasswordSecureString(), Cert.EphemeralIfPossible))
@@ -1409,7 +1414,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
                 TestExportSingleCert(ct, pfxCer);
             }
         }
-#endif
 
         private static void TestExportSingleCert(X509ContentType ct)
         {
@@ -1485,10 +1489,12 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             get
             {
                 yield return new object[] { X509KeyStorageFlags.DefaultKeySet };
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
                 yield return new object[] { X509KeyStorageFlags.EphemeralKeySet };
-#endif
             }
         }
 

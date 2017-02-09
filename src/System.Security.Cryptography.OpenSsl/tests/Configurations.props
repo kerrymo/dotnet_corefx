@@ -3,7 +3,6 @@
   <PropertyGroup>
     <BuildConfigurations>
       netstandard-Unix;
-      netcoreapp-Unix;
     </BuildConfigurations>
   </PropertyGroup>
 </Project>

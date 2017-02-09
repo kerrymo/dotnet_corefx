@@ -4,7 +4,10 @@
   <PropertyGroup>
     <ProjectGuid>{A28B0064-EFB2-4B77-B97C-DECF5DAB074E}</ProjectGuid>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
     <DefineConstants Condition="'$(TargetGroup)'=='netcoreapp'">$(DefineConstants);netcoreapp</DefineConstants>
+=======
+>>>>>>> Update crypto tests for build changes
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netcoreapp-Unix-Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netcoreapp-Unix-Release|AnyCPU'" />
@@ -19,6 +22,7 @@
     <Compile Include="CertTests.cs" />
     <Compile Include="ChainHolder.cs" />
     <Compile Include="ChainTests.cs" />
+    <Compile Include="ChainTests.netstandard.cs" />
     <Compile Include="CollectionImportTests.cs" />
     <Compile Include="CollectionTests.cs" />
     <Compile Include="ContentTypeTests.cs" />
@@ -26,6 +30,7 @@
     <Compile Include="ExportTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="FindTests.cs" />
+    <Compile Include="ImportTests.cs" />
     <Compile Include="InteropTests.cs" />
     <Compile Include="LoadFromFileTests.cs" />
     <Compile Include="NameTests.cs" />
@@ -42,10 +47,6 @@
     <Compile Include="$(CommonTestPath)\System\PlatformDetection.cs">
       <Link>CommonTest\System\PlatformDetection.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetGroup)'=='netstandard' OR '$(TargetGroup)'=='netcoreapp'">
-    <Compile Include="ChainTests.netstandard.cs" />
-    <Compile Include="ImportTests.cs" />
     <Compile Include="$(CommonTestPath)\System\Runtime\Serialization\Formatters\BinaryFormatterHelpers.cs">
       <Link>Common\System\Runtime\Serialization\Formatters\BinaryFormatterHelpers.cs</Link>
     </Compile>

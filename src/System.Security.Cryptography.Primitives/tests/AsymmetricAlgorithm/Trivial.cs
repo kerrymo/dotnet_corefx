@@ -52,7 +52,10 @@ namespace System.Security.Cryptography.Encryption.Tests.Asymmetric
             }
         }
 
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
         [Fact]
         public static void ClearCallsDispose()
         {
@@ -61,7 +64,6 @@ namespace System.Security.Cryptography.Encryption.Tests.Asymmetric
             s.Clear();
             Assert.True(s.IsDisposed);
         }
-#endif
 
         [Fact]
         public static void TestInvalidAlgorithm()

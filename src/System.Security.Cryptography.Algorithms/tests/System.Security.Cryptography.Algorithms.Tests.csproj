@@ -13,6 +13,55 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard-Windows_NT-Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard-Windows_NT-Release|AnyCPU'" />
   <ItemGroup>
+    <Compile Include="AesProvider.cs" />
+    <Compile Include="AesManagedTests.cs" />
+    <Compile Include="AesTests.cs" />
+    <Compile Include="AsymmetricSignatureFormatterTests.cs" />
+    <Compile Include="BlockSizeValueTests.cs" />
+    <Compile Include="CryptoConfigTests.cs" />
+    <Compile Include="DefaultDSAProvider.cs" />
+    <Compile Include="DefaultECDsaProvider.cs" />
+    <Compile Include="DefaultRSAProvider.cs" />
+    <Compile Include="DESProvider.cs" />
+    <Compile Include="DESTests.cs" />
+    <Compile Include="DSASignatureFormatterTests.cs" />
+    <Compile Include="ECDiffieHellmanPublicKeyTests.cs" />
+    <Compile Include="HashAlgorithmTest.cs" />
+    <Compile Include="IncrementalHashTests.cs" />
+    <Compile Include="InvalidUsageTests.cs" />
+    <Compile Include="HmacMD5Tests.cs" />
+    <Compile Include="HmacSha1Tests.cs" />
+    <Compile Include="HmacSha256Tests.cs" />
+    <Compile Include="HmacSha384Tests.cs" />
+    <Compile Include="HmacSha512Tests.cs" />
+    <Compile Include="HmacTests.cs" />
+    <Compile Include="PaddingModeTests.cs" />
+    <Compile Include="MD5Tests.cs" />
+    <Compile Include="PKCS1MaskGenerationMethodTest.cs" />
+    <Compile Include="RandomNumberGeneratorTests.cs" />
+    <Compile Include="RC2Provider.cs" />
+    <Compile Include="RC2Tests.cs" />
+    <Compile Include="ReusabilityTests.cs" />
+    <Compile Include="Rfc2202HmacTests.cs" />
+    <Compile Include="Rfc2898Tests.cs" />
+    <Compile Include="Rfc4231HmacTests.cs" />
+    <Compile Include="RijndaelTests.cs" />
+    <Compile Include="RSAKeyExchangeFormatterTests.cs" />
+    <Compile Include="RSASignatureFormatterTests.cs" />
+    <Compile Include="Sha1ManagedTests.cs" />
+    <Compile Include="Sha1Tests.cs" />
+    <Compile Include="Sha256ManagedTests.cs" />
+    <Compile Include="Sha256Tests.cs" />
+    <Compile Include="Sha384ManagedTests.cs" />
+    <Compile Include="Sha384Tests.cs" />
+    <Compile Include="Sha512ManagedTests.cs" />
+    <Compile Include="Sha512Tests.cs" />
+    <Compile Include="SignatureDescriptionTests.cs" />
+    <Compile Include="TripleDesProvider.cs" />
+    <Compile Include="TripleDesTests.cs" />
+    <Compile Include="$(CommonPath)\Interop\Unix\Interop.Libraries.cs">
+      <Link>Common\Interop\Unix\Interop.Libraries.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\PlatformDetection.cs">
       <Link>CommonTest\System\PlatformDetection.cs</Link>
     </Compile>
@@ -37,6 +86,9 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\AES\AesModeTests.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\AES\AesModeTests.cs</Link>
     </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AsymmetricSignatureFormatter.cs">
+      <Link>CommonTest\System\Security\Cryptography\AsymmetricSignatureFormatter.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\ByteUtils.cs">
       <Link>CommonTest\System\Security\Cryptography\ByteUtils.cs</Link>
     </Compile>
@@ -49,6 +101,7 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\AES\AesFactory.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\AES\AesFactory.cs</Link>
     </Compile>
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\EC\CurveDef.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\EC\CurveDef.cs</Link>
     </Compile>
@@ -154,6 +207,8 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AsymmetricSignatureFormatter.cs">
       <Link>CommonTest\System\Security\Cryptography\AsymmetricSignatureFormatter.cs</Link>
     </Compile>
+=======
+>>>>>>> Update crypto tests for build changes
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DES\DESCipherTests.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DES\DESCipherTests.cs</Link>
     </Compile>
@@ -187,6 +242,30 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAXml.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAXml.cs</Link>
     </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\EC\CurveDef.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\EC\CurveDef.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaFactory.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaFactory.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaImportExport.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaImportExport.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaStub.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaStub.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTests.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTests.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTests.NistValidation.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTests.NistValidation.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTestsBase.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTestsBase.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTestData.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTestData.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaXml.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaXml.cs</Link>
     </Compile>
@@ -199,6 +278,18 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RC2\RC2Tests.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RC2\RC2Tests.cs</Link>
     </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\EncryptDecrypt.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\EncryptDecrypt.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\ImportExport.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\ImportExport.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\KeyGeneration.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\KeyGeneration.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAFactory.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAFactory.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAKeyExchangeFormatter.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAKeyExchangeFormatter.cs</Link>
     </Compile>
@@ -208,9 +299,28 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs</Link>
     </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\SignVerify.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\SignVerify.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\TestData.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\TestData.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\TripleDES\TripleDESCipherTests.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\TripleDES\TripleDESCipherTests.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\TripleDES\TripleDESFactory.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\TripleDES\TripleDESFactory.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\TripleDES\TripleDESReusabilityTests.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\TripleDES\TripleDESReusabilityTests.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common\Interop\Unix\" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- ToDo: Remove this P2P reference once the required changes exist -->
+    <ProjectReference Include="..\src\System.Security.Cryptography.Algorithms.csproj" />
+  </ItemGroup>  
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.targets))\dir.targets" />
 </Project>

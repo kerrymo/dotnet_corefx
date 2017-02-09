@@ -75,7 +75,10 @@ namespace System.Security.Cryptography.X509Certificates.Tests
 
                 Assert.Equal(notAfter, cert2.NotAfter);
                 Assert.Equal(notBefore, cert2.NotBefore);
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 
+=======
+>>>>>>> Update crypto tests for build changes
                 Assert.Equal(notAfter.ToString(), cert2.GetExpirationDateString());
                 Assert.Equal(notBefore.ToString(), cert2.GetEffectiveDateString());
 

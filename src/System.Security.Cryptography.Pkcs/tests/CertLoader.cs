@@ -12,11 +12,11 @@ namespace Test.Cryptography
     {
         // Prefer ephemeral when available
         protected X509KeyStorageFlags KeyStorageFlags =
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
             X509KeyStorageFlags.EphemeralKeySet;
-#else
-            X509KeyStorageFlags.DefaultKeySet;
-#endif
 
         /// <summary>
         /// Returns a freshly allocated X509Certificate2 instance that has a public key only. 
@@ -144,14 +144,14 @@ namespace Test.Cryptography
 
         internal override CertLoader CloneAsEphemeralLoader()
         {
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
 #if netcoreapp
+=======
+>>>>>>> Update crypto tests for build changes
             return new CertLoaderFromRawData(CerData, PfxData, Password)
             {
                 KeyStorageFlags = X509KeyStorageFlags.EphemeralKeySet,
             };
-#else
-            throw new PlatformNotSupportedException();
-#endif
         }
 
         internal override CertLoader CloneAsPerphemeralLoader()

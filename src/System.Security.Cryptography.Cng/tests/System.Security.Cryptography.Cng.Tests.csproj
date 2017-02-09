@@ -3,7 +3,10 @@
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.props))\dir.props" />
   <PropertyGroup>
     <ProjectGuid>{FF53459F-66F7-4F00-8D36-DF440CE18419}</ProjectGuid>
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
     <DefineConstants Condition="'$(TargetGroup)'=='netcoreapp'">$(DefineConstants);netcoreapp</DefineConstants>
+=======
+>>>>>>> Update crypto tests for build changes
   </PropertyGroup>
   <!-- Default configurations to help VS understand the configurations -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netcoreapp-Windows_NT-Debug|AnyCPU'" />
@@ -61,16 +64,58 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DSACngProvider.cs" />
+    <Compile Include="DSACngTests.cs" />
+    <Compile Include="ECDsaCngProvider.cs" />
+    <Compile Include="RSACngProvider.cs" />
+    <Compile Include="$(CommonTestPath)\System\IO\PositionValueStream.cs">
+      <Link>CommonTest\System\IO\PositionValueStream.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\ByteUtils.cs">
       <Link>CommonTest\System\Security\Cryptography\ByteUtils.cs</Link>
     </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\CryptoUtils.cs">
       <Link>CommonTest\System\Security\Cryptography\CryptoUtils.cs</Link>
     </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AsymmetricSignatureFormatter.cs">
+      <Link>CommonTest\System\Security\Cryptography\AsymmetricSignatureFormatter.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAFactory.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAFactory.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAImportExport.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAImportExport.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAKeyGeneration.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAKeyGeneration.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSASignatureFormatter.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSASignatureFormatter.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSASignVerify.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSASignVerify.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSATestData.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSATestData.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAXml.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\DSA\DSAXml.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaXml.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaXml.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAKeyExchangeFormatter.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAKeyExchangeFormatter.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSASignatureFormatter.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSASignatureFormatter.cs</Link>
+    </Compile>
+    <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs">
+      <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs</Link>
+    </Compile>
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\EC\CurveDef.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\EC\CurveDef.cs</Link>
     </Compile>
-    <Compile Include="ECDsaCngProvider.cs" />
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaFactory.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaFactory.cs</Link>
     </Compile>
@@ -92,7 +137,6 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTestData.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\ECDsa\ECDsaTestData.cs</Link>
     </Compile>
-    <Compile Include="RSACngProvider.cs" />
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\EncryptDecrypt.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\EncryptDecrypt.cs</Link>
     </Compile>
@@ -111,6 +155,7 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\TestData.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\TestData.cs</Link>
     </Compile>
+<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
     <Compile Include="$(CommonTestPath)\System\IO\PositionValueStream.cs">
       <Link>CommonTest\System\IO\PositionValueStream.cs</Link>
     </Compile>
@@ -154,6 +199,8 @@
     <Compile Include="$(CommonTestPath)\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs">
       <Link>CommonTest\System\Security\Cryptography\AlgorithmImplementations\RSA\RSAXml.cs</Link>
     </Compile>
+=======
+>>>>>>> Update crypto tests for build changes
   </ItemGroup>
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.targets))\dir.targets" />
 </Project>
