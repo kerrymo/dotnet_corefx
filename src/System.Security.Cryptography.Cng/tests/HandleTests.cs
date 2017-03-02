@@ -37,10 +37,6 @@ namespace System.Security.Cryptography.Cng.Tests
             }
         }
 
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-#if netcoreapp
-=======
->>>>>>> Update crypto tests for build changes
         [Fact]
         public static void SafeNCryptKeyHandle_ParentHandle_Invalid()
         {

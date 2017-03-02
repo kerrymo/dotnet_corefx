@@ -218,10 +218,6 @@ namespace System.Security.Cryptography.Encryption.Tests.Asymmetric
                 Assert.Equal(false, output.CanRead);
             }
 
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-#if netcoreapp
-=======
->>>>>>> Update crypto tests for build changes
             using (MemoryStream output = new MemoryStream())
             {
                 using (CryptoStream encryptStream = new CryptoStream(output, encryptor, CryptoStreamMode.Write, leaveOpen: false))

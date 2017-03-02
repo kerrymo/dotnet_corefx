@@ -10,10 +10,6 @@ namespace System.Security.Cryptography.Encryption.Tests.Symmetric
 {
     public static class TrivialTests
     {
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-=======
-        
->>>>>>> Update crypto tests for build changes
         [Theory]
         [InlineData(-1)]
         [InlineData(0)]

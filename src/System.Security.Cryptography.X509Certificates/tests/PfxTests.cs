@@ -39,10 +39,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-#if netcoreapp
-=======
->>>>>>> Update crypto tests for build changes
         [Theory]
         [MemberData(nameof(StorageFlags))]
         public static void TestConstructor_SecureString(X509KeyStorageFlags keyStorageFlags)
@@ -122,10 +118,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-#if netcoreapp
-=======
->>>>>>> Update crypto tests for build changes
         [Fact]
         public static void TestPrivateKeyProperty()
         {
@@ -184,10 +176,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-#if netcoreapp
-=======
->>>>>>> Update crypto tests for build changes
         [Fact]
         public static void ECDsaPrivateKeyProperty_WindowsPfx()
         {
@@ -272,10 +260,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             }
         }
 
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-#if netcoreapp
-=======
->>>>>>> Update crypto tests for build changes
         [Fact]
         [PlatformSpecific(TestPlatforms.Windows)]  // Uses P/Invokes
         public static void EphemeralImport_HasNoKeyName()
@@ -389,11 +373,6 @@ namespace System.Security.Cryptography.X509Certificates.Tests
             get
             {
                 yield return new object[] { X509KeyStorageFlags.DefaultKeySet };
-<<<<<<< 209d0c5ce81488c01736c989d5d7bacd48c720f8
-
-#if netcoreapp
-=======
->>>>>>> Update crypto tests for build changes
                 yield return new object[] { X509KeyStorageFlags.EphemeralKeySet };
             }
         }
