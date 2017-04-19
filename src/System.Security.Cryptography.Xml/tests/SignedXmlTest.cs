@@ -285,7 +285,7 @@ namespace System.Security.Cryptography.Xml.Tests
         }
 
         [Fact]
-        [ActiveIssue(17001, TestPlatforms.OSX)]
+        //[ActiveIssue(17001, TestPlatforms.OSX)]
         public void AsymmetricDSASignature()
         {
             SignedXml signedXml = MSDNSample();

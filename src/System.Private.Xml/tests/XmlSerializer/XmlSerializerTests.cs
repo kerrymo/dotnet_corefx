@@ -2375,7 +2375,7 @@ string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
     }
 
 #if ReflectionOnly
-    [ActiveIssue(14259)]
+    //[ActiveIssue(14259)]
 #endif
     [Fact]
     public static void XmlUnknownElementAndEventHandlerTest()
@@ -2408,7 +2408,7 @@ string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
     }
 
 #if ReflectionOnly
-    [ActiveIssue(14259)]
+    //[ActiveIssue(14259)]
 #endif
     [Fact]
     public static void XmlUnknownNodeAndEventHandlerTest()
@@ -3005,7 +3005,7 @@ string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
     }
 
 #if ReflectionOnly
-    [ActiveIssue(10675)]
+    //[ActiveIssue(10675)]
 #endif
     [Fact]
     public static void XmlMembersMapping_PrimitiveValue()
@@ -3019,7 +3019,7 @@ string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
     }
 
 #if ReflectionOnly
-    [ActiveIssue(10675)]
+    //[ActiveIssue(10675)]
 #endif
     [Fact]
     public static void XmlMembersMapping_SimpleType()
@@ -3033,7 +3033,7 @@ string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
     }
 
 #if ReflectionOnly
-    [ActiveIssue(10675)]
+    //[ActiveIssue(10675)]
 #endif
     [Fact]
     public static void XmlMembersMapping_CompositeType()
@@ -3048,7 +3048,7 @@ string.Format(@"<?xml version=""1.0"" encoding=""utf-8""?>
     }
 
 #if ReflectionOnly
-    [ActiveIssue(18076)]
+    //[ActiveIssue(18076)]
 #endif
     [Fact]
     public static void Xml_HiddenDerivedFieldTest()

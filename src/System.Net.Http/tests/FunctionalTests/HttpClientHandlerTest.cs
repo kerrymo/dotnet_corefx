@@ -851,7 +851,7 @@ namespace System.Net.Http.Functional.Tests
         }
 
         [OuterLoop] // TODO: Issue #11345
-        [ActiveIssue(17174, TestPlatforms.AnyUnix)] // https://github.com/curl/curl/issues/1354
+        //[ActiveIssue(17174, TestPlatforms.AnyUnix)] // https://github.com/curl/curl/issues/1354
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
@@ -1451,7 +1451,7 @@ namespace System.Net.Http.Functional.Tests
                         {
                             Assert.False(contentDisposed, "Expected request content to not be disposed while request data still being sent");
                         }
-                        else // [ActiveIssue(9006, TestPlatforms.AnyUnix)]
+                        else // //[ActiveIssue(9006, TestPlatforms.AnyUnix)]
                         {
                             await post;
                             Assert.True(contentDisposed, "Current implementation will dispose of the request content once response headers arrive");

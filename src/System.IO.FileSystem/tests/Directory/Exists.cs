@@ -333,7 +333,7 @@ namespace System.IO.Tests
         }
 
         [Fact]
-        [ActiveIssue(1221)]
+        //[ActiveIssue(1221)]
         [PlatformSpecific(TestPlatforms.Windows)] // drive labels
         public void NotReadyDriveAsPath_ReturnsFalse()
         {
@@ -350,7 +350,7 @@ namespace System.IO.Tests
         }
 
         [Fact]
-        [ActiveIssue(1221)]
+        //[ActiveIssue(1221)]
         [PlatformSpecific(TestPlatforms.Windows)] // drive labels
         public void SubdirectoryOnNotReadyDriveAsPath_ReturnsFalse()
         {

@@ -294,7 +294,7 @@ namespace System.Net.Sockets.Tests
 
         [OuterLoop] // TODO: Issue #11345
         [Fact]
-        [ActiveIssue(17209, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(17209, TestPlatforms.AnyUnix)]
         public void AcceptAsync_WithTargetSocket_Success()
         {
             using (Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
@@ -310,7 +310,7 @@ namespace System.Net.Sockets.Tests
             }
         }
 
-        [ActiveIssue(17209, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(17209, TestPlatforms.AnyUnix)]
         [OuterLoop] // TODO: Issue #11345
         [Theory]
         [InlineData(false)]
@@ -364,7 +364,7 @@ namespace System.Net.Sockets.Tests
 
         [OuterLoop] // TODO: Issue #11345
         [Fact]
-        [ActiveIssue(17209, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(17209, TestPlatforms.AnyUnix)]
         public void AcceptAsync_WithAlreadyBoundTargetSocket_Failed()
         {
             using (Socket listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))

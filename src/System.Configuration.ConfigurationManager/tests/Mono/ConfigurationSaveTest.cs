@@ -333,7 +333,7 @@ namespace MonoTests.System.Configuration
         #region Tests
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void DefaultValues()
         {
             Run<DefaultMachineConfig>("DefaultValues", (config, label) =>
@@ -352,7 +352,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void AddDefaultListElement()
         {
             Run<DefaultMachineConfig>("AddDefaultListElement", (config, label) =>
@@ -375,7 +375,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void AddDefaultListElement2()
         {
             Run<DefaultMachineConfig>("AddDefaultListElement2", (config, label) =>
@@ -412,7 +412,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void AddDefaultListElement3()
         {
             Run<DefaultMachineConfig>("AddDefaultListElement3", (config, label) =>
@@ -483,7 +483,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void AddListElement()
         {
             Run<DefaultMachineConfig>("AddListElement", (config, label) =>
@@ -507,7 +507,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void NotModifiedAfterSave()
         {
             Run<DefaultMachineConfig>("NotModifiedAfterSave", (config, label) =>
@@ -552,7 +552,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void AddSection()
         {
             Run("AddSection", (config, label) =>
@@ -568,7 +568,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void AddElement()
         {
             Run<DefaultMachineConfig>("AddElement", (config, label) =>
@@ -619,7 +619,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void ModifyListElement()
         {
             Run<RoamingAndExe>("ModifyListElement", (config, label) =>
@@ -640,7 +640,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void ModifyListElement2()
         {
             Run<RoamingAndExe>("ModifyListElement2", (config, label) =>
@@ -664,7 +664,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void TestElementWithCollection()
         {
             Run<DefaultMachineConfig2>("TestElementWithCollection", (config, label) =>
@@ -722,7 +722,7 @@ namespace MonoTests.System.Configuration
         }
 
         [Fact]
-        [ActiveIssue(18431)]
+        //[ActiveIssue(18431)]
         public void TestElementWithCollection2()
         {
             Run<DefaultMachineConfig2>("TestElementWithCollection2", (config, label) =>

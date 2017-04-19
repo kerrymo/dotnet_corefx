@@ -62,7 +62,7 @@ namespace System.Net.Tests
                     }
 
                     byte[] extraBytesSentAfterClose = Encoding.UTF8.GetBytes("Should not be sent.");
-                    // [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix])
+                    // //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix])
                     if (PlatformDetection.IsWindows)
                     {
                         await outputStream.WriteAsync(extraBytesSentAfterClose, 0, extraBytesSentAfterClose.Length);
@@ -107,7 +107,7 @@ namespace System.Net.Tests
                         outputStream.Close();
                     }
 
-                    // [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix])
+                    // //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix])
                     byte[] extraBytesSentAfterClose = Encoding.UTF8.GetBytes("Should not be sent.");
                     if (PlatformDetection.IsWindows)
                     {
@@ -313,7 +313,7 @@ namespace System.Net.Tests
         }
 
         [ConditionalFact(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
         public async Task Write_TooMuch_ThrowsProtocolViolationException()
         {
             using (HttpClient client = new HttpClient())
@@ -342,7 +342,7 @@ namespace System.Net.Tests
         }
 
         [ConditionalFact(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
         public async Task Write_TooLittleAsynchronouslyAndClose_ThrowsInvalidOperationException()
         {
             using (HttpClient client = new HttpClient())
@@ -369,7 +369,7 @@ namespace System.Net.Tests
         }
 
         [ConditionalFact(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
         public async Task Write_TooLittleSynchronouslyAndClose_ThrowsInvalidOperationException()
         {
             using (HttpClient client = new HttpClient())
@@ -398,7 +398,7 @@ namespace System.Net.Tests
         [ConditionalTheory(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
         public async Task Write_HeadersToClosedConnectionAsynchronously_ThrowsHttpListenerException(bool ignoreWriteExceptions)
         {
             const string Text = "Some-String";
@@ -428,7 +428,7 @@ namespace System.Net.Tests
         [ConditionalTheory(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
         public async Task Write_HeadersToClosedConnectionSynchronously_ThrowsHttpListenerException(bool ignoreWriteExceptions)
         {
             const string Text = "Some-String";
@@ -458,8 +458,8 @@ namespace System.Net.Tests
         [ConditionalTheory(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
-        [ActiveIssue(18188, platforms: TestPlatforms.Windows)] // Indeterminate failure - socket not always fully disconnected.
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18188, platforms: TestPlatforms.Windows)] // Indeterminate failure - socket not always fully disconnected.
         public async Task Write_ContentToClosedConnectionAsynchronously_ThrowsHttpListenerException(bool ignoreWriteExceptions)
         {
             const string Text = "Some-String";
@@ -500,8 +500,8 @@ namespace System.Net.Tests
         [ConditionalTheory(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
-        [ActiveIssue(18188, platforms: TestPlatforms.Windows)] // Indeterminate failure - socket not always fully disconnected.
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18188, platforms: TestPlatforms.Windows)] // Indeterminate failure - socket not always fully disconnected.
         public async Task Write_ContentToClosedConnectionSynchronously_ThrowsHttpListenerException(bool ignoreWriteExceptions)
         {
             const string Text = "Some-String";
@@ -553,7 +553,7 @@ namespace System.Net.Tests
         }
 
         [Fact]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)]
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)]
         public async Task EndWrite_InvalidAsyncResult_ThrowsArgumentException()
         {
             using (HttpListenerResponse response1 = await _helper.GetResponse())
@@ -569,7 +569,7 @@ namespace System.Net.Tests
         }
 
         [Fact]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)]
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)]
         public async Task EndWrite_CalledTwice_ThrowsInvalidOperationException()
         {
             using (HttpListenerResponse response1 = await _helper.GetResponse())

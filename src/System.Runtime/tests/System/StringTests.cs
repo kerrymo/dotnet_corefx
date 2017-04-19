@@ -830,7 +830,7 @@ namespace System.Tests
         }
 
         [Theory]
-        [ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
+        //[ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
         [InlineData(StringComparison.CurrentCulture)]
         [InlineData(StringComparison.CurrentCultureIgnoreCase)]
         [InlineData(StringComparison.Ordinal)]
@@ -1248,7 +1248,7 @@ namespace System.Tests
         }
 
         [Theory]
-        [ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
+        //[ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
         [InlineData("He\0lo", "He\0lo", 0)]
         [InlineData("He\0lo", "He\0", 0)]
         [InlineData("He\0lo", "\0", 2)]
@@ -1729,7 +1729,7 @@ namespace System.Tests
         }
 
         [Theory]
-        [ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
+        //[ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
         [InlineData("He\0lo", "He\0lo", 0)]
         [InlineData("He\0lo", "He\0", 0)]
         [InlineData("He\0lo", "\0", 2)]
@@ -2128,7 +2128,7 @@ namespace System.Tests
         }
 
         [Theory]
-        [ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
+        //[ActiveIssue("https://github.com/dotnet/coreclr/issues/2051", TestPlatforms.AnyUnix)]
         [InlineData(StringComparison.CurrentCulture)]
         [InlineData(StringComparison.CurrentCultureIgnoreCase)]
         [InlineData(StringComparison.Ordinal)]

@@ -304,7 +304,7 @@ namespace System.Net.Sockets.Tests
     {
         [Theory]
         [MemberData(nameof(DualMode_Connect_IPAddress_DualMode_Data))]
-        [ActiveIssue(4002, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(4002, TestPlatforms.AnyUnix)]
         public void DualModeConnect_LoopbackDnsToHost_Helper(IPAddress listenOn, bool dualModeServer)
         {
             int port;
@@ -323,7 +323,7 @@ namespace System.Net.Sockets.Tests
     {
         [Theory]
         [MemberData(nameof(DualMode_Connect_IPAddress_DualMode_Data))]
-        [ActiveIssue(4002, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(4002, TestPlatforms.AnyUnix)]
         public void DualModeConnect_DnsEndPointToHost_Helper(IPAddress listenOn, bool dualModeServer)
         {
             int port;
@@ -616,7 +616,7 @@ namespace System.Net.Sockets.Tests
 
         [Theory]
         [MemberData(nameof(DualMode_Connect_IPAddress_DualMode_Data))]
-        [ActiveIssue(4002, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(4002, TestPlatforms.AnyUnix)]
         public void DualModeConnectAsync_DnsEndPointToHost_Helper(IPAddress listenOn, bool dualModeServer)
         {
             int port;
@@ -642,7 +642,7 @@ namespace System.Net.Sockets.Tests
 
         [Theory]
         [MemberData(nameof(DualMode_Connect_IPAddress_DualMode_Data))]
-        [ActiveIssue(4002, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(4002, TestPlatforms.AnyUnix)]
         public void DualModeConnectAsync_Static_DnsEndPointToHost_Helper(IPAddress listenOn, bool dualModeServer)
         {
             int port;

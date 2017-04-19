@@ -438,7 +438,7 @@ namespace System.Numerics.Tests
             yield return new object[] { double.NaN, double.NegativeInfinity, double.NaN, double.NaN };            
         }
 
-        [ActiveIssue(15455)]
+        //[ActiveIssue(15455)]
         [Theory, MemberData(nameof(ASin_Advanced_TestData))]
         [SkipOnTargetFramework(TargetFrameworkMonikers.NetFramework)]
         public static void ASin_Advanced(double real, double imaginary, double expectedReal, double expectedImaginary)

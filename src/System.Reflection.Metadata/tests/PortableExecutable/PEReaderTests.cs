@@ -85,7 +85,7 @@ namespace System.Reflection.PortableExecutable.Tests
         }
 
         [Fact(Skip = "https://github.com/dotnet/corefx/issues/7996")]
-        [ActiveIssue(7996)]
+        //[ActiveIssue(7996)]
         public void SubStream()
         {
             var stream = new MemoryStream();

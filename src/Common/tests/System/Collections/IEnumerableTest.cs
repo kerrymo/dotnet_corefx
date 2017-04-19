@@ -339,7 +339,7 @@ namespace Tests.Collections
         }
 
         [Fact]
-        [ActiveIssue(1170)]
+        //[ActiveIssue(1170)]
         public void EnumeratePastEndThenModify()
         {
             object[] items = GenerateItems(EnumerableSize);

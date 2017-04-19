@@ -78,7 +78,7 @@ namespace System.Net.Http.Functional.Tests
         }
 
         [SkipOnTargetFramework(TargetFrameworkMonikers.NetFramework, "dotnet/corefx #17691")] // Hangs on NETFX
-        [ActiveIssue(9075, TestPlatforms.AnyUnix)] // recombine this test into the subsequent one when issue is fixed
+        //[ActiveIssue(9075, TestPlatforms.AnyUnix)] // recombine this test into the subsequent one when issue is fixed
         [OuterLoop] // includes seconds of delay
         [Fact]
         public Task ReadAsStreamAsync_ReadAsync_Cancel_BodyNeverStarted_TaskCanceledQuickly()

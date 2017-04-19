@@ -123,7 +123,7 @@ namespace System.Net.Tests
         [ConditionalTheory(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // Different behaviour when not chunked, that needs investigation.
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // Different behaviour when not chunked, that needs investigation.
         public async Task Read_LargeLengthAsynchronous_Success(bool transferEncodingChunked)
         {
             string text = new string('a', 128 * 1024 + 1); // More than 128kb
@@ -167,7 +167,7 @@ namespace System.Net.Tests
         [ConditionalTheory(nameof(PlatformDetection) + "." + nameof(PlatformDetection.IsNotOneCoreUAP))]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // Different behaviour when not chunked, that needs investigation.
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // Different behaviour when not chunked, that needs investigation.
         public async Task Read_LargeLengthSynchronous_Success(bool transferEncodingChunked)
         {
             string text = new string('a', 128 * 1024 + 1); // More than 128kb
@@ -388,7 +388,7 @@ namespace System.Net.Tests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No validation performed
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No validation performed
         public async Task EndRead_InvalidAsyncResult_ThrowsArgumentException(bool chunked)
         {
             HttpListenerRequest request1 = await _helper.GetRequest(chunked);
@@ -407,7 +407,7 @@ namespace System.Net.Tests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No validation performed
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No validation performed
         public async Task EndRead_CalledTwice_ThrowsInvalidOperationException(bool chunked)
         {
             HttpListenerRequest request = await _helper.GetRequest(chunked);
@@ -421,7 +421,7 @@ namespace System.Net.Tests
         }
 
         [Fact]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
         public async Task Read_FromClosedConnectionAsynchronously_ThrowsHttpListenerException()
         {
             const string Text = "Some-String";
@@ -452,7 +452,7 @@ namespace System.Net.Tests
         }
 
         [Fact]
-        [ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
+        //[ActiveIssue(18128, platforms: TestPlatforms.AnyUnix)] // No exception thrown
         public async Task Read_FromClosedConnectionSynchronously_ThrowsHttpListenerException()
         {
             const string Text = "Some-String";

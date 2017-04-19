@@ -2612,7 +2612,7 @@ public static partial class DataContractSerializerTests
     }
 
 #if ReflectionOnly
-    [ActiveIssue(13699)]
+    //[ActiveIssue(13699)]
 #endif
     [Fact]
     public static void DCS_ExtensionDataObjectTest()

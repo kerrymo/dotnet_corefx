@@ -57,7 +57,7 @@ namespace System.Net.Sockets.Tests
         // is a no-op unless specialized network settings using PowerShell configuration are first applied to the
         // machine. This is currently difficult to test in the CI environment. So, this ests will be disabled for now
         [OuterLoop] // TODO: Issue #11345
-        [ActiveIssue(4887)]
+        //[ActiveIssue(4887)]
         public void ReuseUnicastPort_CreateSocketSetOptionToOneAndGetOption_SocketsReuseUnicastPortSupport_OptionIsOne()
         {
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

@@ -123,7 +123,7 @@ namespace System.Reflection.Metadata.Tests
         }
 
         [Fact]
-        [ActiveIssue(7996)]
+        //[ActiveIssue(7996)]
         public void FromMetadataStream_NonZeroStart()
         {
             var stream = new MemoryStream();

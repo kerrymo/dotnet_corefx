@@ -317,7 +317,7 @@ namespace System.Net.Sockets.Tests
         [InlineData(SocketImplementationType.Async)]
         [Trait("IPv4", "true")]
         [Trait("IPv6", "true")]
-        [ActiveIssue(4002, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(4002, TestPlatforms.AnyUnix)]
         public void Socket_StaticConnectAsync_Success(SocketImplementationType type)
         {
             Assert.True(Capability.IPv4Support() && Capability.IPv6Support());

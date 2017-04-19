@@ -45,7 +45,7 @@ namespace System.IO.Pipes.Tests
 
         [ConditionalFact(nameof(IsSuperUser))]
         [PlatformSpecific(TestPlatforms.AnyUnix)]  // Uses P/Invokes
-        [ActiveIssue(0)]
+        //[ActiveIssue(0)]
         public void RunAsClient_Unix()
         {
             string pipeName = Path.GetRandomFileName();

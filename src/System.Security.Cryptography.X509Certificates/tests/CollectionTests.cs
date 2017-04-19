@@ -632,7 +632,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
         }
 
         [Fact]
-        [ActiveIssue(2745, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(2745, TestPlatforms.AnyUnix)]
         public static void ImportMultiplePrivateKeysPfx()
         {
             using (ImportedCollection ic = Cert.Import(TestData.MultiPrivateKeyPfx))
@@ -724,7 +724,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
         }
 
         [Fact]
-        [ActiveIssue(2746, TestPlatforms.AnyUnix)]
+        //[ActiveIssue(2746, TestPlatforms.AnyUnix)]
         public static void ExportEmpty_Pkcs12()
         {
             var collection = new X509Certificate2Collection();
@@ -735,7 +735,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
         }
 
         [Fact]
-        [ActiveIssue(16705, TestPlatforms.OSX)]
+        //[ActiveIssue(16705, TestPlatforms.OSX)]
         public static void ExportUnrelatedPfx()
         {
             // Export multiple certificates which are not part of any kind of certificate chain.
@@ -801,7 +801,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
         }
 
         [Fact]
-        [ActiveIssue(2743, TestPlatforms.AnyUnix & ~TestPlatforms.OSX)]
+        //[ActiveIssue(2743, TestPlatforms.AnyUnix & ~TestPlatforms.OSX)]
         public static void ExportMultiplePrivateKeys()
         {
             var collection = new X509Certificate2Collection();
@@ -828,7 +828,7 @@ namespace System.Security.Cryptography.X509Certificates.Tests
                 }
                 catch (PlatformNotSupportedException)
                 {
-                    // [ActiveIssue(2743, TestPlatforms.AnyUnix)]
+                    // //[ActiveIssue(2743, TestPlatforms.AnyUnix)]
                     // Our Unix builds can't export more than one private key in a single PFX, so this is
                     // their exit point.
                     //

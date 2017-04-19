@@ -28,7 +28,7 @@ namespace System.Net.Sockets.Performance.Tests
             }
         }
 
-        [ActiveIssue(13349, TestPlatforms.OSX)]
+        //[ActiveIssue(13349, TestPlatforms.OSX)]
         [OuterLoop]
         [Fact]
         public void SocketPerformance_MultipleSocketClientAsync_LocalHostServerAsync()

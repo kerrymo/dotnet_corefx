@@ -2278,7 +2278,7 @@ public static partial class DataContractJsonSerializerTests
     }
 
 #if ReflectionOnly
-    [ActiveIssue(13699)]
+    //[ActiveIssue(13699)]
 #endif
     [Fact]
     public static void DCJS_ExtensionDataObjectTest()
@@ -2497,7 +2497,7 @@ public static partial class DataContractJsonSerializerTests
     }
 
     [Fact]
-    [ActiveIssue(18538, TestPlatforms.FreeBSD | TestPlatforms.Linux | TestPlatforms.NetBSD)]
+    //[ActiveIssue(18538, TestPlatforms.FreeBSD | TestPlatforms.Linux | TestPlatforms.NetBSD)]
     public static void DCJS_VerifyDateTimeForFormatStringDCJsonSerSetting()
     {
         var dcjsSettings = new DataContractJsonSerializerSettings()
@@ -2516,7 +2516,7 @@ public static partial class DataContractJsonSerializerTests
     }
 
     [Fact]
-    [ActiveIssue(18539, TestPlatforms.Linux)]
+    //[ActiveIssue(18539, TestPlatforms.Linux)]
     public static void DCJS_VerifyDateTimeForFormatStringDCJsonSerSettings()
     {
         var jsonTypes = new JsonTypes();
@@ -2577,7 +2577,7 @@ public static partial class DataContractJsonSerializerTests
     }
 
     [Fact]
-    [ActiveIssue(18512, TestPlatforms.Linux)]
+    //[ActiveIssue(18512, TestPlatforms.Linux)]
     public static void DCJS_VerifyDateTimeForDateTimeFormat()
     {
         var jsonTypes = new JsonTypes();
@@ -2695,7 +2695,7 @@ public static partial class DataContractJsonSerializerTests
     }
 
 #if ReflectionOnly
-    [ActiveIssue(18373)]
+    //[ActiveIssue(18373)]
 #endif
     [Fact]
     public static void DCJS_VerifyDictionaryFormat()

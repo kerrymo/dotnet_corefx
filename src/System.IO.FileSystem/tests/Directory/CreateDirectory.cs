@@ -242,7 +242,7 @@ namespace System.IO.Tests
         }
 
         [Fact]
-        [ActiveIssue(11687)]
+        //[ActiveIssue(11687)]
         [PlatformSpecific(TestPlatforms.Windows)]  // long directory path throws PathTooLongException
         public void DirectoryLongerThanMaxLongPath_ThrowsPathTooLongException()
         {
@@ -514,7 +514,7 @@ namespace System.IO.Tests
         }
 
         [Fact]
-        [ActiveIssue(1221)]
+        //[ActiveIssue(1221)]
         [PlatformSpecific(TestPlatforms.Windows)] // testing drive labels
         public void NotReadyDriveAsPath_ThrowsDirectoryNotFoundException()
         {   // Behavior is suspect, should really have thrown IOException similar to the SubDirectory case
@@ -533,7 +533,7 @@ namespace System.IO.Tests
 
         [Fact]
         [PlatformSpecific(TestPlatforms.Windows)] // testing drive labels
-        [ActiveIssue(1221)]
+        //[ActiveIssue(1221)]
         public void SubdirectoryOnNotReadyDriveAsPath_ThrowsIOException()
         {
             var drive = IOServices.GetNotReadyDrive();

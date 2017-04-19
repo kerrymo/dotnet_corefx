@@ -355,7 +355,7 @@ namespace System.Diagnostics.Tests
             }
         }
 
-        [ActiveIssue(12696)]
+        //[ActiveIssue(12696)]
         [Fact, PlatformSpecific(TestPlatforms.Windows), OuterLoop] // Uses P/Invokes, Requires admin privileges
         public void TestUserCredentialsPropertiesOnWindows()
         {
